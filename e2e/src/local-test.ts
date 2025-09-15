@@ -480,10 +480,10 @@ async function getProofForL1Message(setup: TokenSetup, receipt: ContractTransact
       gasLimit,
     },
   );
-  const claimReceipt = await claimTx.wait();
+  let claimReceipt = await claimTx.wait();
   while (!claimReceipt) {
     console.log(`L1→L2: Waiting for [claimMessage] transaction to be finalized on L2: transactionHash=${claimTx.hash}`);
-    receipt = await claimTx.wait();
+    claimReceipt = await claimTx.wait();
   }
   console.log(
     `L1→L2: Confirmed [claimMessage] transaction on L2: transactionHash=${claimTx.hash} status=${claimReceipt.status}`,
@@ -641,9 +641,11 @@ async function main() {
     if (sendMessages) {
       const msgL2ToL1 = await sendL2ToL1(setup, etherToWei("0.001"), true);
       await getProofForL2Message(setup, msgL2ToL1.receipt);
+      //await getProofForL2Message(setup, msgL2ToL1.receipt);
 
       const msgL1ToL2 = await sendL1ToL2(setup, etherToWei("1.1"), true);
       await getProofForL1Message(setup, msgL1ToL2.receipt);
+      //await getProofForL1Message(setup, msgL1ToL2.receipt);
     }
   } catch (err) {
     console.error("Encountered an error:", err);

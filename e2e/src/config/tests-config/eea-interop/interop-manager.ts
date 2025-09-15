@@ -28,6 +28,11 @@ export default class InteropManager implements IInteropManager {
     functionCallData?: string,
   ): Promise<TransactionResponse> | null {
     console.log(targetNetworkId, targetContractAddress, functionCallData);
+    console.log(`Emits an event currently`);
+    console.log(`Sending to a L2 Linea network requires a call to  
+                 L1MessageService:sendMessage(targetContractAddress,fee,functionCallData)`);
+    console.log(`Sending to a L1 Anchor network requires a call to  
+                 L2MessageService:sendMessage(targetContractAddress,fee,functionCallData)`);
     return null;
   }
 
@@ -37,6 +42,13 @@ export default class InteropManager implements IInteropManager {
     encodedProof?: string,
   ): Promise<TransactionResponse> | null {
     console.log(sourceNetworkId, encodedInfo, encodedProof);
+    console.log(`Makes use of a verifying connector contract for the source network to 
+                 extract the verified destination contract address and function call data`);
+    console.log(`Receiving from a L2 Linea network requires a call to  
+                 L1MessageService:claimMessageWithProof()`);
+    console.log(`Receiving from a L1 Anchor network requires a call to  
+                 L2MessageService:claimMessage()`);
+
     return null;
   }
 
