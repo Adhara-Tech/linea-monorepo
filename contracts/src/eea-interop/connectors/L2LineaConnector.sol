@@ -4,17 +4,20 @@ import "../../libraries/EfficientLeftRightKeccak.sol";
 import "../../messaging/libraries/MessageHashing.sol";
 
 import "../ConnectorBase.sol";
-
 import "../interfaces/IAuthParams.sol";
+
 import "../interfaces/IConnector.sol";
 
+import "./LineaConnector.sol";
 import "./interfaces/IL2LineaConnector.sol";
-
 import {BitMaps} from "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
-contract LineaL2Connector is ILineaL2Connector, ConnectorBase {
+contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
   using BitMaps for BitMaps.BitMap;
   using EfficientLeftRightKeccak for *;
+
+  /// @dev The default hash value.
+  bytes32 internal constant EMPTY_HASH = 0x0;
 
   // @notice Initialize minimumFeeInWei variable.
   uint256 public minimumFeeInWei;
@@ -39,13 +42,37 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase {
     uint256 networkId,
     bytes calldata encodedInfo,
     bytes calldata encodedProof
-  ) external view virtual override returns (address contractAddress, bytes memory functionCallData) {
-    contractAddress = address(0);
-    functionCallData = "0x";
+  ) external virtual override returns (address contractAddress, bytes memory functionCallData) {
 
     // Receiving from a L2 Linea network requires a call to L1MessageService:claimMessageWithProof(). This will execute the call.
     // Verification requires access to a map [l2MerkleRootsDepths].
     // The map [l2MerkleRootsDepths] is updated by an external function [finalizeBlocks] invoked to finalize compressed blocks, with a proof, in the rollup contract.
+
+    (uint256 targetNetworkId, address targetContractAddress, bytes memory msgData) = abi.decode(encodedInfo, (uint256, address, bytes));
+    MessageData memory message = abi.decode(msgData, (MessageData));
+    Proof memory proof = abi.decode(encodedProof, (Proof));
+
+    uint256 merkleDepth = l2MerkleRootsDepths[proof.proof.root];
+
+    if (merkleDepth == 0) {
+      revert L2MerkleRootDoesNotExist();
+    }
+
+    if (merkleDepth != proof.proof.witnesses.length) {
+      revert ProofLengthDifferentThanMerkleDepth(merkleDepth, proof.proof.witnesses.length);
+    }
+
+    _setL2L1MessageToClaimed(message.messageNumber);
+    //_addUsedAmount(message.fee + message.value);
+
+    bytes32 messageHash = this.hashMessage(message.from, message.to, message.fee, message.value, message.messageNumber, message.data);
+    if (!_verifyMerkleProof(messageHash,proof.proof.witnesses,proof.proof.leafIndex,proof.proof.root)) {
+      revert InvalidMerkleProof();
+    }
+    emit MessageClaimed(messageHash);
+
+    contractAddress = targetContractAddress;
+    functionCallData = message.data;
   }
 
   function authenticateHiddenAuthParams(
@@ -60,8 +87,8 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase {
     uint256 networkId,
     address contractAddress,
     bytes calldata functionCallData
-  ) external virtual override {
-    bytes memory functionCallDataWithAuthParams = encodeAuthParams(localNetworkId, msg.sender, functionCallData);
+  ) external virtual payable override {
+    bytes memory functionCallDataWithAuthParams = encodeAuthParams(functionCallData, this.getLocalNetworkId(), msg.sender);
 
     // Sending to a L2 Linea network requires a call to L1MessageService:sendMessage(targetContractAddress,fee,functionCallData), embedded in the rollup contract on L1.
     // Update the map [rollingHashes] via the function [_addRollingHash] that is used when messages are anchored on L2 by a trusted coordinator.
@@ -76,7 +103,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase {
     }
     uint256 messageNumber = nextMessageNumber++;
     uint256 valueSent = msg.value - inputFee;
-    bytes32 messageHash = MessageHashing._hashMessage(msg.sender, contractAddress, inputFee, valueSent, messageNumber, functionCallData);
+    bytes32 messageHash = this.hashMessage(msg.sender, contractAddress, inputFee, valueSent, messageNumber, functionCallData);
     _addRollingHash(messageNumber, messageHash);
     emit MessageSent(msg.sender, contractAddress, inputFee, valueSent, messageNumber, functionCallData, messageHash);
   }
@@ -106,6 +133,15 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase {
       revert MessageAlreadyClaimed(_messageNumber);
     }
     _messageClaimedBitMap.set(_messageNumber);
+  }
+
+  /**
+   * @notice Checks if the L2->L1 message is claimed or not.
+   * @param messageNumber The message number on L2.
+   * @return isClaimed Returns whether or not the message with _messageNumber has been claimed.
+   */
+  function _isMessageClaimed(uint256 messageNumber) external view returns (bool isClaimed) {
+    isClaimed = _messageClaimedBitMap.get(messageNumber);
   }
 
   /**
@@ -149,11 +185,69 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase {
   }
 
   /**
-   * @notice Checks if the L2->L1 message is claimed or not.
-   * @param _messageNumber The message number on L2.
-   * @return isClaimed Returns whether or not the message with _messageNumber has been claimed.
+   * @notice Internal function to validate L1 rolling hash.
+   * @param rollingHashMessageNumber Message number associated with the rolling hash as computed on L2.
+   * @param rollingHash L1 rolling hash as computed on L2.
    */
-  function isMessageClaimed(uint256 _messageNumber) external view returns (bool isClaimed) {
-    isClaimed = _messageClaimedBitMap.get(_messageNumber);
+  function _validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) internal view {
+    if (rollingHashMessageNumber == 0) {
+      if (rollingHash != EMPTY_HASH) {
+        revert MissingMessageNumberForRollingHash(rollingHash);
+      }
+    } else {
+      if (rollingHash == EMPTY_HASH) {
+        revert MissingRollingHashForMessageNumber(rollingHashMessageNumber);
+      }
+      if (rollingHashes[rollingHashMessageNumber] != rollingHash) {
+        revert L1RollingHashDoesNotExistOnL1(rollingHashMessageNumber, rollingHash);
+      }
+    }
   }
+
+  /**
+   * @notice Verify merkle proof
+   * @param _leafHash Leaf hash.
+   * @param _proof Sparse merkle tree proof.
+   * @param _leafIndex Index of the leaf.
+   * @param _root Merkle root.
+   * @dev The depth of the tree is expected to be validated elsewhere beforehand.
+   * @return proofIsValid Returns if the proof is valid or not.
+   */
+  function _verifyMerkleProof(
+    bytes32 _leafHash,
+    bytes32[] memory _proof,
+    uint32 _leafIndex,
+    bytes32 _root
+  ) internal pure returns (bool proofIsValid) {
+    uint32 maxAllowedIndex = _safeCastToUint32((2 ** _proof.length) - 1);
+
+    if (_leafIndex > maxAllowedIndex) {
+      revert LeafIndexOutOfBounds(_leafIndex, maxAllowedIndex);
+    }
+
+    bytes32 node = _leafHash;
+
+    for (uint256 height; height < _proof.length; ++height) {
+      if (((_leafIndex >> height) & 1) == 1) {
+        node = EfficientLeftRightKeccak._efficientKeccak(_proof[height], node);
+      } else {
+        node = EfficientLeftRightKeccak._efficientKeccak(node, _proof[height]);
+      }
+    }
+    proofIsValid = node == _root;
+  }
+
+  /**
+   * @notice Tries to safely cast to uint32.
+   * @param _value The value being cast to uint32.
+   * @return castUint32 Returns a uint32 safely cast.
+   * @dev This is based on OpenZeppelin's SafeCast library.
+   */
+  function _safeCastToUint32(uint256 _value) internal pure returns (uint32 castUint32) {
+    if (_value > type(uint32).max) {
+      revert SafeCastOverflowedUintDowncast(32, _value);
+    }
+    castUint32 = uint32(_value);
+  }
+
 }

@@ -10,7 +10,7 @@ contract EthereumConnector is IEEAConnector, ConnectorBase {
     uint256 networkId,
     bytes calldata encodedInfo,
     bytes calldata encodedProof
-  ) external view virtual override returns (address contractAddress, bytes memory functionCallData) {
+  ) external virtual override returns (address contractAddress, bytes memory functionCallData) {
     revert NotImplementedOrSupported();
   }
 
@@ -25,8 +25,8 @@ contract EthereumConnector is IEEAConnector, ConnectorBase {
     uint256 networkId,
     address contractAddress,
     bytes calldata functionCallData
-  ) external virtual override {
-    bytes memory functionCallDataWithAuthParams = encodeAuthParams(localNetworkId, msg.sender, functionCallData);
+  ) external virtual payable override {
+    bytes memory functionCallDataWithAuthParams = encodeAuthParams(functionCallData, this.getLocalNetworkId(), msg.sender);
     emit CrosschainFunctionCall(networkId, contractAddress, functionCallDataWithAuthParams);
   }
 }

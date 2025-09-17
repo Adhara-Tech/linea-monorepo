@@ -244,7 +244,7 @@ contract InteropManager is IInteroperable
     address contractAddress,
     bytes calldata functionCallData
   ) external override {
-    (address connectorAddress, bytes32 networkStatus) = getRemoteDestinationNetworkData(networkId);
+    (address connectorAddress, bytes32 networkStatus) = this.getRemoteDestinationNetworkData(networkId);
     require(networkStatus == STATUS_ENABLED, "Connector does not exist or is disabled.");
     IConnector crosschainConnector = IConnector(connectorAddress);
     // Update local storage and commit to outgoing call
@@ -279,7 +279,7 @@ contract InteropManager is IInteroperable
     bytes calldata encodedInfo,
     bytes calldata encodedProof
   ) external override {
-    (address connectorAddress, bytes32 networkStatus) = getRemoteSourceNetworkData(networkId);
+    (address connectorAddress, bytes32 networkStatus) = this.getRemoteSourceNetworkData(networkId);
     require(networkStatus == STATUS_ENABLED, "Connector does not exist or is disabled.");
     IConnector crosschainConnector = IConnector(connectorAddress);
     // Get verified execution parameters for incoming call

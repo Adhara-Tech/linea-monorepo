@@ -13,7 +13,7 @@ abstract contract IConnector {
     uint256 networkId,
     bytes calldata encodedInfo,
     bytes calldata encodedProof
-  ) external view virtual returns (address contractAddress, bytes memory functionCallData);
+  ) external virtual returns (address contractAddress, bytes memory functionCallData);
 
   /**
    * @notice Authenticates the hidden auth parameters appended to the end of the function calldata.
@@ -37,7 +37,7 @@ abstract contract IConnector {
     uint256 networkId,
     address contractAddress,
     bytes calldata functionCallData
-  ) external virtual;
+  ) external virtual payable;
 
   function getLocalNetworkId() external view virtual returns (uint256);
 

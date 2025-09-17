@@ -1,16 +1,17 @@
 pragma solidity ^0.8.30;
 
+import "../../libraries/EfficientLeftRightKeccak.sol";
+
+import "../../messaging/libraries/MessageHashing.sol";
 import "../ConnectorBase.sol";
 
 import "../interfaces/IAuthParams.sol";
-import "../interfaces/IConnector.sol";
 
+import "../interfaces/IConnector.sol";
+import "./LineaConnector.sol";
 import "./interfaces/IL1LineaConnector.sol";
 
-import "../../messaging/libraries/MessageHashing.sol";
-import "../../../libraries/EfficientLeftRightKeccak.sol";
-
-contract LineaL1Connector is ILineaL1Connector, ConnectorBase {
+contract LineaL1Connector is ILineaL1Connector, ConnectorBase, LineaConnector {
 
   // @notice Initialize minimumFeeInWei variable.
   uint256 public minimumFeeInWei;
@@ -36,13 +37,21 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase {
     uint256 networkId,
     bytes calldata encodedInfo,
     bytes calldata encodedProof
-  ) external view virtual override returns (address contractAddress, bytes memory functionCallData) {
-    contractAddress = address(0);
-    functionCallData = "0x";
-
+  ) external virtual override returns (address contractAddress, bytes memory functionCallData) {
     // Receiving from a L1 Linea anchor network requires a call to L2MessageService:claimMessage(). This will execute the call.
     // Verification requires access to a map [inboxL1L2MessageStatus].
     // The map [inboxL1L2MessageStatus] is updated by an external function [anchorL1L2MessageHashes] invoked by a trusted party to anchor L1 [rollingHashes] on L2.
+
+    (uint256 targetNetworkId, address targetContractAddress, bytes memory msgData) = abi.decode(encodedInfo, (uint256, address, bytes));
+    MessageData memory message = abi.decode(msgData, (MessageData));
+    // Proof memory proof = abi.decode(encodedProof, (Proof));
+
+    bytes32 messageHash = this.hashMessage(message.from, message.to, message.fee, message.value, message.messageNumber, message.data);
+    _updateL1L2MessageStatusToClaimed(messageHash);
+    emit MessageClaimed(messageHash);
+
+    contractAddress = targetContractAddress;
+    functionCallData = message.data;
   }
 
   function authenticateHiddenAuthParams(
@@ -57,8 +66,8 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase {
     uint256 networkId,
     address contractAddress,
     bytes calldata functionCallData
-  ) external virtual override {
-    bytes memory functionCallDataWithAuthParams = encodeAuthParams(localNetworkId, msg.sender, functionCallData);
+  ) external virtual payable override {
+    bytes memory functionCallDataWithAuthParams = encodeAuthParams(functionCallData, this.getLocalNetworkId(), msg.sender);
 
     // Sending to a L1 Linea anchor network requires a call to L2MessageService:sendMessage(targetContractAddress,fee,functionCallData), a separate contract on L2.
     // Increment [nextMessageNumber], handle fees and emits a [MessageSent] event.
@@ -82,7 +91,7 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase {
     // Rate limit and revert is in the rate limiter.
     //_addUsedAmount(valueSent + relayerFee);
 
-    bytes32 messageHash = MessageHashing._hashMessage(msg.sender, contractAddress, relayerFee, valueSent, messageNumber, functionCallDataWithAuthParams);
+    bytes32 messageHash = this.hashMessage(msg.sender, contractAddress, relayerFee, valueSent, messageNumber, functionCallData);
     emit MessageSent(msg.sender, contractAddress, relayerFee, valueSent, messageNumber, functionCallDataWithAuthParams, messageHash);
 
     // Pay minimum fees.
@@ -92,9 +101,8 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase {
     }
   }
 
-  /**
-	 * @notice Add cross-chain L1->L2 message hashes in storage.
-   * @dev Only address that has the correct role are allowed to call this function.
+  /* @notice Add cross-chain L1->L2 message hashes in storage.
+   * @dev Only address that has the correct role are allowed to call this function, e.g. a trusted a coordinator.
    * @dev Note that in the unlikely event of a duplicate anchoring, the lastAnchoredL1MessageNumber MUST NOT be incremented,
    * @dev and the rolling hash not calculated, else synchronisation will break.
    * @dev If starting number is zero, an underflow error is expected.
@@ -130,7 +138,7 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase {
       messageHash = messageHashes[i];
       if (inboxL1L2MessageStatus[messageHash] == INBOX_STATUS_UNKNOWN) {
         inboxL1L2MessageStatus[messageHash] = INBOX_STATUS_RECEIVED;
-        rollingHash = EfficientLeftRightKeccak.efficientKeccak(rollingHash, messageHash);
+        rollingHash = EfficientLeftRightKeccak._efficientKeccak(rollingHash, messageHash);
         ++currentL1MessageNumber;
       }
     }

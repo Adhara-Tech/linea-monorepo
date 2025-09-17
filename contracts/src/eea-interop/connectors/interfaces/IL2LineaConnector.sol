@@ -4,19 +4,6 @@ import "./ILineaConnector.sol";
 
 interface ILineaL2Connector is ILineaConnector {
 
-  // Split into EEA structures
-  struct ClaimMessageWithProofParams {
-    bytes32[] proof;
-    uint256 messageNumber;
-    uint32 leafIndex;
-    address from;
-    address to;
-    uint256 fee;
-    uint256 value;
-    address payable feeRecipient;
-    bytes32 merkleRoot;
-    bytes data;
-  }
 
   /**
 	 * @notice Emitted when a new message is sent and the rolling hash updated.
@@ -49,4 +36,22 @@ interface ILineaL2Connector is ILineaConnector {
 
   /* @dev Thrown when the L2 messaging blocks offsets bytes length is not a multiple of 2. */
   error BytesLengthNotMultipleOfTwo(uint256 bytesLength);
+
+  /* @dev Thrown when finalizationData.l1RollingHash does not exist on L1 (Feedback loop). */
+  error L1RollingHashDoesNotExistOnL1(uint256 messageNumber, bytes32 rollingHash);
+
+  /* @dev Thrown when a rolling hash is provided without a corresponding message number. */
+  error MissingMessageNumberForRollingHash(bytes32 rollingHash);
+
+  /* @dev Thrown when a message number is provided without a corresponding rolling hash. */
+  error MissingRollingHashForMessageNumber(uint256 messageNumber);
+
+  /* @dev Thrown when L2 Merkle root does not exist. */
+  error L2MerkleRootDoesNotExist();
+
+  /* @dev Thrown when the Merkle proof is invalid. */
+  error InvalidMerkleProof();
+
+  /* @dev Thrown when Merkle depth doesn't match proof length. */
+  error ProofLengthDifferentThanMerkleDepth(uint256 actual, uint256 expected);
 }

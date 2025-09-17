@@ -3,11 +3,13 @@ pragma solidity ^0.8.30;
 
 import { AccessControlUpgradeable } from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import { L1MessageService } from "../messaging/l1/L1MessageService.sol";
+//import { LineaL2Connector } from "../eea-interop/connectors/L2LineaConnector.sol"; // TODO:
 import { ZkEvmV2 } from "./ZkEvmV2.sol";
 import { ILineaRollup } from "./interfaces/ILineaRollup.sol";
 import { PermissionsManager } from "../security/access/PermissionsManager.sol";
 
 import { EfficientLeftRightKeccak } from "../libraries/EfficientLeftRightKeccak.sol";
+
 /**
  * @title Contract to manage cross-chain messaging on L1, L2 data submission, and rollup proof verification.
  * @author ConsenSys Software Inc.
@@ -16,6 +18,7 @@ import { EfficientLeftRightKeccak } from "../libraries/EfficientLeftRightKeccak.
 abstract contract LineaRollupBase is
   AccessControlUpgradeable,
   ZkEvmV2,
+  // LineaL2Connector,
   L1MessageService,
   PermissionsManager,
   ILineaRollup
@@ -102,7 +105,8 @@ abstract contract LineaRollupBase is
 
     __PauseManager_init(_initializationData.pauseTypeRoles, _initializationData.unpauseTypeRoles);
 
-    __MessageService_init(_initializationData.rateLimitPeriodInSeconds, _initializationData.rateLimitAmountInWei);
+    // TODO:
+    //__MessageService_init(_initializationData.rateLimitPeriodInSeconds, _initializationData.rateLimitAmountInWei);
 
     if (_initializationData.defaultAdmin == address(0)) {
       revert ZeroAddressNotAllowed();

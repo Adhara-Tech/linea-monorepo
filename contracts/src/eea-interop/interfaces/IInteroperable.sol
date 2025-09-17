@@ -35,7 +35,7 @@ abstract contract IInteroperable
   function addRemoteSourceNetwork(
     uint256 networkId,
     address connectorAddress
-  ) external;
+  ) external virtual;
 
   event AddRemoteSourceNetworkExecuted(uint256 networkId, address connectorAddress);
 
@@ -45,7 +45,7 @@ abstract contract IInteroperable
    */
   function removeRemoteSourceNetwork(
     uint256 networkId
-  ) external;
+  ) external virtual;
 
   event RemoveRemoteSourceNetworkExecuted(uint256 networkId);
 
@@ -55,7 +55,7 @@ abstract contract IInteroperable
    */
   function enableRemoteSourceNetwork(
     uint256 networkId
-  ) external;
+  ) external virtual;
 
   event EnableRemoteSourceNetworkExecuted(uint256 networkId);
 
@@ -65,7 +65,7 @@ abstract contract IInteroperable
    */
   function disableRemoteSourceNetwork(
     uint256 networkId
-  ) external;
+  ) external virtual;
 
   event DisableRemoteSourceNetworkExecuted(uint256 networkId);
 
@@ -75,7 +75,7 @@ abstract contract IInteroperable
    */
   function getRemoteSourceNetworkData(
     uint256 networkId
-  ) external view returns (
+  ) external virtual view returns (
     address connectorAddress,
     bytes32 status
   );
@@ -88,7 +88,7 @@ abstract contract IInteroperable
   function listRemoteSourceNetworks(
     uint256 startIndex,
     uint256 limit
-  ) external view returns (
+  ) external virtual view returns (
     uint256[] memory items,
     bool moreItems,
     uint256 providedStartIndex,
@@ -103,7 +103,7 @@ abstract contract IInteroperable
   function addRemoteDestinationNetwork(
     uint256 networkId,
     address connectorAddress
-  ) external;
+  ) external virtual;
 
   event AddRemoteDestinationNetworkExecuted(uint256 networkId, address connectorAddress);
 
@@ -113,7 +113,7 @@ abstract contract IInteroperable
    */
   function removeRemoteDestinationNetwork(
     uint256 networkId
-  ) external;
+  ) external virtual;
 
   event RemoveRemoteDestinationNetworkExecuted(uint256 networkId);
 
@@ -123,7 +123,7 @@ abstract contract IInteroperable
    */
   function enableRemoteDestinationNetwork(
     uint256 networkId
-  ) external;
+  ) external virtual;
 
   event EnableRemoteDestinationNetworkExecuted(uint256 networkId);
 
@@ -133,7 +133,7 @@ abstract contract IInteroperable
    */
   function disableRemoteDestinationNetwork(
     uint256 networkId
-  ) external;
+  ) external virtual;
 
   event DisableRemoteDestinationNetworkExecuted(uint256 networkId);
 
@@ -143,7 +143,7 @@ abstract contract IInteroperable
    */
   function getRemoteDestinationNetworkData(
     uint256 networkId
-  ) external view returns (
+  ) external virtual view returns (
     address connectorAddress,
     bytes32 status
   );
@@ -156,7 +156,7 @@ abstract contract IInteroperable
   function listRemoteDestinationNetworks(
     uint256 startIndex,
     uint256 limit
-  ) external view returns (
+  ) external virtual view returns (
     uint256[] memory items,
     bool moreItems,
     uint256 providedStartIndex,

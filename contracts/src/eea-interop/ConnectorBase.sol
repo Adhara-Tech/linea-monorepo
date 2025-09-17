@@ -3,7 +3,7 @@ pragma solidity ^0.8.30;
 import "./interfaces/IConnector.sol";
 import "./interfaces/IAuthParams.sol";
 
-contract ConnectorBase is IConnector, IAuthParams {
+abstract contract ConnectorBase is IConnector, IAuthParams {
 
   uint256 private localNetworkId;
   uint256 private remoteNetworkId;
@@ -23,4 +23,6 @@ contract ConnectorBase is IConnector, IAuthParams {
   function setRemoteNetworkId(uint256 networkId) external {
     remoteNetworkId = networkId;
   }
+
+
 }
