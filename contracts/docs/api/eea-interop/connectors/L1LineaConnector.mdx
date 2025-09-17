@@ -1,0 +1,123 @@
+# `LineaL1Connector`
+
+### minimumFeeInWei
+
+```solidity
+uint256 minimumFeeInWei
+```
+
+### nextMessageNumber
+
+```solidity
+uint256 nextMessageNumber
+```
+
+### lastAnchoredL1MessageNumber
+
+```solidity
+uint256 lastAnchoredL1MessageNumber
+```
+
+### l1RollingHashes
+
+```solidity
+mapping(uint256 => bytes32) l1RollingHashes
+```
+
+### INBOX_STATUS_UNKNOWN
+
+```solidity
+uint8 INBOX_STATUS_UNKNOWN
+```
+
+### INBOX_STATUS_RECEIVED
+
+```solidity
+uint8 INBOX_STATUS_RECEIVED
+```
+
+### INBOX_STATUS_CLAIMED
+
+```solidity
+uint8 INBOX_STATUS_CLAIMED
+```
+
+### inboxL1L2MessageStatus
+
+```solidity
+mapping(bytes32 => uint256) inboxL1L2MessageStatus
+```
+
+### decodeAndVerify
+
+```solidity
+function decodeAndVerify(uint256 networkId, bytes encodedInfo, bytes encodedProof) external virtual returns (address contractAddress, bytes functionCallData)
+```
+
+Performs all steps needed to verify a crosschain call and returns verified parameters for function call execution.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | The id of the remote chain that originated the cross blockchain call. |
+| encodedInfo | bytes | The encoded information of the event needed to trigger the crosschain call. |
+| encodedProof | bytes | The signature or proof used to check whether the encodedInfo is valid. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contractAddress | address | The verified contract address where the crosschain function call should be executed. |
+| functionCallData | bytes | The verified function call data with which the crosschain function call should be made. |
+
+### authenticateHiddenAuthParams
+
+```solidity
+function authenticateHiddenAuthParams(address contractAddress, bytes functionCallData) external view virtual returns (bool)
+```
+
+Authenticates the hidden auth parameters appended to the end of the function calldata.
+See https://entethalliance.org/specs/dlt-interop/#application-authentication-parameters
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contractAddress | address | The address of the contract where the call is being made to |
+| functionCallData | bytes | The calldata of the call, including the hidden auth parameters |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool |  |
+
+### updateAndCommit
+
+```solidity
+function updateAndCommit(uint256 networkId, address contractAddress, bytes functionCallData) external payable virtual
+```
+
+Performs all local prerequisite updates and commits to a crosschain call.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | Identifier of target network where the function call is to be made. |
+| contractAddress | address | Address of the contract on the target network to which the function call is to be made. |
+| functionCallData | bytes | The function call data that consists of the ABI-encoded function selector and input parameter data with which the remote function should be called. |
+
+### anchorL1L2MessageHashes
+
+```solidity
+function anchorL1L2MessageHashes(bytes32[] messageHashes, uint256 startingMessageNumber, uint256 finalMessageNumber, bytes32 finalRollingHash) external
+```
+
+### _updateL1L2MessageStatusToClaimed
+
+```solidity
+function _updateL1L2MessageStatusToClaimed(bytes32 messageHash) internal
+```
+

@@ -1,0 +1,290 @@
+# `IInteroperable`
+
+### STATUS_NON_EXISTENT
+
+```solidity
+bytes32 STATUS_NON_EXISTENT
+```
+
+### STATUS_CREATED
+
+```solidity
+bytes32 STATUS_CREATED
+```
+
+### STATUS_ENABLED
+
+```solidity
+bytes32 STATUS_ENABLED
+```
+
+### STATUS_DISABLED
+
+```solidity
+bytes32 STATUS_DISABLED
+```
+
+### inboundCall
+
+```solidity
+function inboundCall(uint256 networkId, bytes encodedInfo, bytes encodedProof) external virtual
+```
+
+Executes a crosschain function call from a remote chain, if a valid proof is provided.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | Identifier of the source network that initiated the remote function call. This must be a registered remote chain. |
+| encodedInfo | bytes | The ABI-encoded remote source network information containing the local destination network identifier, contract address and function call data encoded in remote event, transaction or state change data that needs to be verified before executing the function call locally. |
+| encodedProof | bytes | The ABI-encoded remote source network proof data and/or signatures that an implementation can use to verify the information given in encodedInfo. |
+
+### InboundCallExecuted
+
+```solidity
+event InboundCallExecuted(uint256 networkId, bytes encodedInfo, bytes encodedProof)
+```
+
+### outboundCall
+
+```solidity
+function outboundCall(uint256 networkId, address contractAddress, bytes functionCallData) external virtual
+```
+
+Attempts to trigger a crosschain function call in a remote network, which will only succeed of a valid proof can be provided.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | Identifier of target network where the function call is to be made. |
+| contractAddress | address | Address of the contract on the target network to which the function call is to be made. |
+| functionCallData | bytes | The function call data that consists of the ABI-encoded function selector and input parameter data with which the remote function should be called. |
+
+### OutboundCallExecuted
+
+```solidity
+event OutboundCallExecuted(uint256 networkId, address contractAddress, bytes functionCallData)
+```
+
+### addRemoteSourceNetwork
+
+```solidity
+function addRemoteSourceNetwork(uint256 networkId, address connectorAddress) external virtual
+```
+
+Adds a remote network as a source of remote function calls by linking a local connector to the remote network to enable interop with the remote network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+| connectorAddress | address | the address of the network connector contract in the local network |
+
+### AddRemoteSourceNetworkExecuted
+
+```solidity
+event AddRemoteSourceNetworkExecuted(uint256 networkId, address connectorAddress)
+```
+
+### removeRemoteSourceNetwork
+
+```solidity
+function removeRemoteSourceNetwork(uint256 networkId) external virtual
+```
+
+Removes a remote source network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### RemoveRemoteSourceNetworkExecuted
+
+```solidity
+event RemoveRemoteSourceNetworkExecuted(uint256 networkId)
+```
+
+### enableRemoteSourceNetwork
+
+```solidity
+function enableRemoteSourceNetwork(uint256 networkId) external virtual
+```
+
+Enables the execution of remote function calls from the remote source network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### EnableRemoteSourceNetworkExecuted
+
+```solidity
+event EnableRemoteSourceNetworkExecuted(uint256 networkId)
+```
+
+### disableRemoteSourceNetwork
+
+```solidity
+function disableRemoteSourceNetwork(uint256 networkId) external virtual
+```
+
+Disables the execution of remote function calls from the remote source network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### DisableRemoteSourceNetworkExecuted
+
+```solidity
+event DisableRemoteSourceNetworkExecuted(uint256 networkId)
+```
+
+### getRemoteSourceNetworkData
+
+```solidity
+function getRemoteSourceNetworkData(uint256 networkId) external view virtual returns (address connectorAddress, bytes32 status)
+```
+
+Gets the remote source network data
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### listRemoteSourceNetworks
+
+```solidity
+function listRemoteSourceNetworks(uint256 startIndex, uint256 limit) external view virtual returns (uint256[] items, bool moreItems, uint256 providedStartIndex, uint256 providedLimit)
+```
+
+Returns the list of remote source chains registered for interop
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| startIndex | uint256 | The starting index from where to list the items |
+| limit | uint256 | The number of items to return in the list |
+
+### addRemoteDestinationNetwork
+
+```solidity
+function addRemoteDestinationNetwork(uint256 networkId, address connectorAddress) external virtual
+```
+
+Adds a remote network as a destination of remote function calls by linking a local connector to the remote network to enable interop with the remote network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+| connectorAddress | address | the address of the network connector contract in the local network |
+
+### AddRemoteDestinationNetworkExecuted
+
+```solidity
+event AddRemoteDestinationNetworkExecuted(uint256 networkId, address connectorAddress)
+```
+
+### removeRemoteDestinationNetwork
+
+```solidity
+function removeRemoteDestinationNetwork(uint256 networkId) external virtual
+```
+
+Removes a remote destination network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### RemoveRemoteDestinationNetworkExecuted
+
+```solidity
+event RemoveRemoteDestinationNetworkExecuted(uint256 networkId)
+```
+
+### enableRemoteDestinationNetwork
+
+```solidity
+function enableRemoteDestinationNetwork(uint256 networkId) external virtual
+```
+
+Enables the execution of remote function calls from the remote destination network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### EnableRemoteDestinationNetworkExecuted
+
+```solidity
+event EnableRemoteDestinationNetworkExecuted(uint256 networkId)
+```
+
+### disableRemoteDestinationNetwork
+
+```solidity
+function disableRemoteDestinationNetwork(uint256 networkId) external virtual
+```
+
+Disables the execution of remote function calls from the remote destination network
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### DisableRemoteDestinationNetworkExecuted
+
+```solidity
+event DisableRemoteDestinationNetworkExecuted(uint256 networkId)
+```
+
+### getRemoteDestinationNetworkData
+
+```solidity
+function getRemoteDestinationNetworkData(uint256 networkId) external view virtual returns (address connectorAddress, bytes32 status)
+```
+
+Gets the remote destination network data
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | the id of the remote network |
+
+### listRemoteDestinationNetworks
+
+```solidity
+function listRemoteDestinationNetworks(uint256 startIndex, uint256 limit) external view virtual returns (uint256[] items, bool moreItems, uint256 providedStartIndex, uint256 providedLimit)
+```
+
+Returns the list of remote destination networks registered for interop
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| startIndex | uint256 | The starting index from where to list the items |
+| limit | uint256 | The number of items to return in the list |
+
