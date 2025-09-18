@@ -1,9 +1,10 @@
 pragma solidity ^0.8.30;
 
+import "../../../messaging/l1/interfaces/IL1MessageService.sol";
+
 import "./ILineaConnector.sol";
 
-interface ILineaL2Connector is ILineaConnector {
-
+interface ILineaL2Connector is ILineaConnector, IL1MessageService {
 
   /**
 	 * @notice Emitted when a new message is sent and the rolling hash updated.
@@ -47,11 +48,11 @@ interface ILineaL2Connector is ILineaConnector {
   error MissingRollingHashForMessageNumber(uint256 messageNumber);
 
   /* @dev Thrown when L2 Merkle root does not exist. */
-  error L2MerkleRootDoesNotExist();
+  //error L2MerkleRootDoesNotExist();
 
   /* @dev Thrown when the Merkle proof is invalid. */
-  error InvalidMerkleProof();
+  //error InvalidMerkleProof();
 
   /* @dev Thrown when Merkle depth doesn't match proof length. */
-  error ProofLengthDifferentThanMerkleDepth(uint256 actual, uint256 expected);
+  //error ProofLengthDifferentThanMerkleDepth(uint256 actual, uint256 expected);
 }

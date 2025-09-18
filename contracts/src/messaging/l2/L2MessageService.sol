@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity 0.8.30;
 import { L2MessageServiceBase } from "./L2MessageServiceBase.sol";
+import {IL2MessageService} from "./interfaces/IL2MessageService.sol";
 /**
  * @title Contract to manage cross-chain messaging on L2.
  * @author ConsenSys Software Inc.
  * @custom:security-contact security-report@linea.build
  */
-contract L2MessageService is L2MessageServiceBase {
+contract L2MessageService is L2MessageServiceBase, IL2MessageService {
   /// @dev Total contract storage is 50 slots with the gap below.
   /// @dev Keep 50 free storage slots for future implementation updates to avoid storage collision.
   uint256[50] private __gap_L2MessageService;
@@ -41,5 +42,21 @@ contract L2MessageService is L2MessageServiceBase {
       _pauseTypeRoleAssignments,
       _unpauseTypeRoleAssignments
     );
+  }
+
+  /**
+   * @notice Add cross-chain L1->L2 message hashes in storage.
+   * @param _messageHashes New message hashes to anchor on L2.
+   * @param _startingMessageNumber The expected L1 message number to start when anchoring.
+   * @param _finalMessageNumber The expected L1 message number to end on when anchoring.
+   * @param _finalRollingHash The expected L1 rolling hash to end on when anchoring.
+   */
+  function anchorL1L2MessageHashes(
+    bytes32[] calldata _messageHashes,
+    uint256 _startingMessageNumber,
+    uint256 _finalMessageNumber,
+    bytes32 _finalRollingHash
+  ) external virtual override {
+    _anchorL1L2MessageHashes(_messageHashes, _startingMessageNumber, _finalMessageNumber, _finalRollingHash);
   }
 }

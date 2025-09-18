@@ -1,8 +1,9 @@
 pragma solidity ^0.8.30;
 
 import {ILineaConnector} from "./ILineaConnector.sol";
+import {IL2MessageService} from "../../../messaging/l2/interfaces/IL2MessageService.sol";
 
-interface ILineaL1Connector is ILineaConnector{
+interface ILineaL1Connector is ILineaConnector, IL2MessageService {
 
   /**
    * @notice Emitted after all messages are anchored on L2 and the latest message index and rolling hash stored.

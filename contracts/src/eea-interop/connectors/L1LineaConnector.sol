@@ -101,22 +101,13 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase, LineaConnector {
     }
   }
 
-  /* @notice Add cross-chain L1->L2 message hashes in storage.
-   * @dev Only address that has the correct role are allowed to call this function, e.g. a trusted a coordinator.
-   * @dev Note that in the unlikely event of a duplicate anchoring, the lastAnchoredL1MessageNumber MUST NOT be incremented,
-   * @dev and the rolling hash not calculated, else synchronisation will break.
-   * @dev If starting number is zero, an underflow error is expected.
-   * @param messageHashes New message hashes to anchor on L2.
-   * @param startingMessageNumber The expected L1 message number to start when anchoring.
-   * @param finalMessageNumber The expected L1 message number to end on when anchoring.
-   * @param finalRollingHash The expected L1 rolling hash to end on when anchoring.
-   */
+  /* @notice Add cross-chain L1->L2 message hashes in storage. */
   function anchorL1L2MessageHashes(
     bytes32[] calldata messageHashes,
     uint256 startingMessageNumber,
     uint256 finalMessageNumber,
     bytes32 finalRollingHash
-  ) external {
+  ) external override {
     if (messageHashes.length == 0) {
       revert MessageHashesListLengthIsZero();
     }

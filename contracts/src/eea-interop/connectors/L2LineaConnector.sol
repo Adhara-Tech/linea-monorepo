@@ -36,7 +36,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
 
   // @dev Total contract storage is 53 slots including the gap below.
   // @dev Keep 50 free storage slots for future implementation updates to avoid storage collision.
-  //uint256[50] private __gap_L1MessageManager;
+  uint256[50] private __gap_L1MessageManager;
 
   function decodeAndVerify(
     uint256 networkId,
@@ -151,7 +151,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
    * already enforced to be non-zero in the circuit, and used in the proof's public input.
    * @param _newRoots New L2 Merkle roots.
    */
-  function _addL2MerkleRoots(bytes32[] calldata _newRoots, uint256 _treeDepth) internal {
+  function addL2MerkleRoots(bytes32[] calldata _newRoots, uint256 _treeDepth) external virtual override {
     for (uint256 i; i < _newRoots.length; ++i) {
       if (l2MerkleRootsDepths[_newRoots[i]] != 0) {
         revert L2MerkleRootAlreadyAnchored(_newRoots[i]);
@@ -168,7 +168,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
    * indicates which L2 blocks have L2->L1 messages.
    * @param _currentL2BlockNumber Last L2 block number finalized on L1.
    */
-  function _anchorL2MessagingBlocks(bytes calldata _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) internal {
+  function anchorL2MessagingBlocks(bytes calldata _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual override {
     if (_l2MessagingBlocksOffsets.length % 2 != 0) {
       revert BytesLengthNotMultipleOfTwo(_l2MessagingBlocksOffsets.length);
     }
@@ -189,7 +189,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
    * @param rollingHashMessageNumber Message number associated with the rolling hash as computed on L2.
    * @param rollingHash L1 rolling hash as computed on L2.
    */
-  function _validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) internal view {
+  function validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) external virtual view override {
     if (rollingHashMessageNumber == 0) {
       if (rollingHash != EMPTY_HASH) {
         revert MissingMessageNumberForRollingHash(rollingHash);
@@ -202,6 +202,18 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
         revert L1RollingHashDoesNotExistOnL1(rollingHashMessageNumber, rollingHash);
       }
     }
+  }
+
+  /**
+   * @notice Claims and delivers a cross-chain message using a Merkle proof.
+   * @dev if tree depth is empty, it will revert with L2MerkleRootDoesNotExist.
+   * @dev if tree depth is different than proof size, it will revert with ProofLengthDifferentThanMerkleDepth.
+   * @param _params Collection of claim data with proof and supporting data.
+   */
+  function claimMessageWithProof(
+    ClaimMessageWithProofParams calldata _params
+  ) external virtual override {//nonReentrant distributeFees(_params.fee, _params.to, _params.data, _params.feeRecipient) {
+    //_claimMessageWithProof(_params);
   }
 
   /**

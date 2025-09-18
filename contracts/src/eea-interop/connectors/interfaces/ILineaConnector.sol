@@ -91,7 +91,7 @@ interface ILineaConnector  {
   error ZeroHashNotAllowed();
 
   /**
- * @dev Value doesn't fit in a uint of `bits` size.
+   * @dev Value doesn't fit in a uint of `bits` size.
    * @dev This is based on OpenZeppelin's SafeCast library.
    */
   error SafeCastOverflowedUintDowncast(uint8 bits, uint256 value);

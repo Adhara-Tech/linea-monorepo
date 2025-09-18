@@ -44,4 +44,14 @@ contract TestL2MessageManager is Initializable, L2MessageManager, IGenericErrors
   function setLastAnchoredL1MessageNumber(uint256 _messageNumber) external {
     lastAnchoredL1MessageNumber = _messageNumber;
   }
+
+  function anchorL1L2MessageHashes(
+    bytes32[] calldata _messageHashes,
+    uint256 _startingMessageNumber,
+    uint256 _finalMessageNumber,
+    bytes32 _finalRollingHash
+  ) external {
+    _anchorL1L2MessageHashes(_messageHashes, _startingMessageNumber, _finalMessageNumber, _finalRollingHash);
+  }
+
 }

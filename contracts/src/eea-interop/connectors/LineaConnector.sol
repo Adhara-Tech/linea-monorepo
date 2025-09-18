@@ -1,7 +1,5 @@
 pragma solidity ^0.8.30;
 
-//import "../../libraries/EfficientLeftRightKeccak.sol";
-
 abstract contract LineaConnector  {
 
  /**
