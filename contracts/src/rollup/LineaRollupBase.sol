@@ -18,7 +18,6 @@ import { EfficientLeftRightKeccak } from "../libraries/EfficientLeftRightKeccak.
 abstract contract LineaRollupBase is
   AccessControlUpgradeable,
   ZkEvmV2,
-  //LineaL2Connector,
   L1MessageService,
   PermissionsManager,
   ILineaRollup
@@ -91,7 +90,7 @@ abstract contract LineaRollupBase is
   /// @dev This address is granted the OPERATOR_ROLE after six months of finalization inactivity by the current operators.
   address public fallbackOperator;
 
-  // Message service on L1 to update message roots
+  // Message service on L1 to update message roots, can be external LineaL2Connector.
   address public messagingContractAddress;
 
   /// @dev Keep 50 free storage slots for inheriting contracts.
@@ -111,9 +110,11 @@ abstract contract LineaRollupBase is
 
     __PauseManager_init(_initializationData.pauseTypeRoles, _initializationData.unpauseTypeRoles);
 
-
     __MessageService_init(_initializationData.rateLimitPeriodInSeconds, _initializationData.rateLimitAmountInWei);
-    messagingContractAddress = address(this); // TODO: Needs to be updated later with setMessagingContractAddress()
+    messagingContractAddress = _initializationData.messagingService;
+    if (messagingContractAddress == address(0)) {
+      messagingContractAddress = address(this);
+    }
 
     if (_initializationData.defaultAdmin == address(0)) {
       revert ZeroAddressNotAllowed();
@@ -472,7 +473,11 @@ abstract contract LineaRollupBase is
       revert PointEvaluationResponseInvalid(fieldElements, blsCurveModulus);
     }
   }
-
+  /**
+   * @notice Set the contract to use for messaging storages.
+   * @dev MESSAGING_SETTER_ROLE is required to execute.
+   *
+   */
   function setMessagingContractAddress(address _newContractAddress) external onlyRole(MESSAGING_SETTER_ROLE) {
     if (_newContractAddress == address(0)) {
       revert ZeroAddressNotAllowed();

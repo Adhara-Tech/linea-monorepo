@@ -53,6 +53,7 @@ abstract contract L1MessageService is
    * @param _newRoots New L2 Merkle roots.
    */
   function addL2MerkleRoots(bytes32[] calldata _newRoots, uint256 _treeDepth) external virtual override {
+    // TODO: Check permission
     _addL2MerkleRoots(_newRoots, _treeDepth);
   }
 
@@ -64,6 +65,7 @@ abstract contract L1MessageService is
    * @param _currentL2BlockNumber Last L2 block number finalized on L1.
    */
   function anchorL2MessagingBlocks(bytes calldata _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual override {
+    // TODO: Check permission
     _anchorL2MessagingBlocks(_l2MessagingBlocksOffsets, _currentL2BlockNumber);
   }
 

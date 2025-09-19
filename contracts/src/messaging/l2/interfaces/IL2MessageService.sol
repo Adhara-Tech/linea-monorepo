@@ -20,5 +20,5 @@ interface IL2MessageService {
     uint256 _startingMessageNumber,
     uint256 _finalMessageNumber,
     bytes32 _finalRollingHash
-  ) external;
+  ) external; // TODO: Protect this function with a permission so that only the coordinator can call
 }

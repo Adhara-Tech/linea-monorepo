@@ -46,13 +46,4 @@ interface ILineaL2Connector is ILineaConnector, IL1MessageService {
 
   /* @dev Thrown when a message number is provided without a corresponding rolling hash. */
   error MissingRollingHashForMessageNumber(uint256 messageNumber);
-
-  /* @dev Thrown when L2 Merkle root does not exist. */
-  //error L2MerkleRootDoesNotExist();
-
-  /* @dev Thrown when the Merkle proof is invalid. */
-  //error InvalidMerkleProof();
-
-  /* @dev Thrown when Merkle depth doesn't match proof length. */
-  //error ProofLengthDifferentThanMerkleDepth(uint256 actual, uint256 expected);
 }

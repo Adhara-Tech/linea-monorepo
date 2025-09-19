@@ -16,6 +16,14 @@ bytes32 VERIFIER_UNSETTER_ROLE
 
 The role required to set/remove  proof verifiers by type.
 
+### MESSAGING_SETTER_ROLE
+
+```solidity
+bytes32 MESSAGING_SETTER_ROLE
+```
+
+The role required to set the messaging contract address.
+
 ### SHNARF_EXISTS_DEFAULT_VALUE
 
 ```solidity
@@ -106,6 +114,12 @@ address fallbackOperator
 The address of the fallback operator.
 
 _This address is granted the OPERATOR_ROLE after six months of finalization inactivity by the current operators._
+
+### messagingContractAddress
+
+```solidity
+address messagingContractAddress
+```
 
 ### constructor
 
@@ -330,6 +344,12 @@ __dataEvaluationPoint is modular reduced to be lower than the BLS_CURVE_MODULUS 
 | _kzgCommitment | bytes | The blob KZG commitment. |
 | _kzgProof | bytes | The blob KZG point proof. |
 
+### setMessagingContractAddress
+
+```solidity
+function setMessagingContractAddress(address _newContractAddress) external
+```
+
 ### finalizeBlocks
 
 ```solidity
@@ -368,21 +388,6 @@ Internal function to finalize compressed blocks.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | finalShnarf | bytes32 | The final computed shnarf in finalizing. |
-
-### _validateL2ComputedRollingHash
-
-```solidity
-function _validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) internal view
-```
-
-Internal function to validate l1 rolling hash.
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _rollingHashMessageNumber | uint256 | Message number associated with the rolling hash as computed on L2. |
-| _rollingHash | bytes32 | L1 rolling hash as computed on L2. |
 
 ### _calculateY
 

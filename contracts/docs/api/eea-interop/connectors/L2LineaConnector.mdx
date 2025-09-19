@@ -148,10 +148,10 @@ Checks if the L2->L1 message is claimed or not.
 | ---- | ---- | ----------- |
 | isClaimed | bool | Returns whether or not the message with _messageNumber has been claimed. |
 
-### _addL2MerkleRoots
+### addL2MerkleRoots
 
 ```solidity
-function _addL2MerkleRoots(bytes32[] _newRoots, uint256 _treeDepth) internal
+function addL2MerkleRoots(bytes32[] _newRoots, uint256 _treeDepth) external virtual
 ```
 
 Add the L2 Merkle roots to the storage.
@@ -167,10 +167,10 @@ already enforced to be non-zero in the circuit, and used in the proof's public i
 | _newRoots | bytes32[] | New L2 Merkle roots. |
 | _treeDepth | uint256 |  |
 
-### _anchorL2MessagingBlocks
+### anchorL2MessagingBlocks
 
 ```solidity
-function _anchorL2MessagingBlocks(bytes _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) internal
+function anchorL2MessagingBlocks(bytes _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual
 ```
 
 Emit an event for each L2 block containing L2->L1 messages.
@@ -184,10 +184,10 @@ _This function is called during block finalization._
 | _l2MessagingBlocksOffsets | bytes | Is a sequence of uint16 values, where each value plus the last finalized L2 block number. indicates which L2 blocks have L2->L1 messages. |
 | _currentL2BlockNumber | uint256 | Last L2 block number finalized on L1. |
 
-### _validateL2ComputedRollingHash
+### validateL2ComputedRollingHash
 
 ```solidity
-function _validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) internal view
+function validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) external view virtual
 ```
 
 Internal function to validate L1 rolling hash.
@@ -198,6 +198,23 @@ Internal function to validate L1 rolling hash.
 | ---- | ---- | ----------- |
 | rollingHashMessageNumber | uint256 | Message number associated with the rolling hash as computed on L2. |
 | rollingHash | bytes32 | L1 rolling hash as computed on L2. |
+
+### claimMessageWithProof
+
+```solidity
+function claimMessageWithProof(struct IL1MessageService.ClaimMessageWithProofParams _params) external virtual
+```
+
+Claims and delivers a cross-chain message using a Merkle proof.
+
+_if tree depth is empty, it will revert with L2MerkleRootDoesNotExist.
+if tree depth is different than proof size, it will revert with ProofLengthDifferentThanMerkleDepth._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _params | struct IL1MessageService.ClaimMessageWithProofParams | Collection of claim data with proof and supporting data. |
 
 ### _verifyMerkleProof
 

@@ -89,6 +89,21 @@ _This function is called during block finalization._
 | _l2MessagingBlocksOffsets | bytes | Is a sequence of uint16 values, where each value plus the last finalized L2 block number. indicates which L2 blocks have L2->L1 messages. |
 | _currentL2BlockNumber | uint256 | Last L2 block number finalized on L1. |
 
+### _validateL2ComputedRollingHash
+
+```solidity
+function _validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) internal view
+```
+
+Internal function to validate l1 rolling hash.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _rollingHashMessageNumber | uint256 | Message number associated with the rolling hash as computed on L2. |
+| _rollingHash | bytes32 | L1 rolling hash as computed on L2. |
+
 ### isMessageClaimed
 
 ```solidity

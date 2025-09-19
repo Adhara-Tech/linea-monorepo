@@ -36,6 +36,7 @@ interface ILineaRollup {
     IPauseManager.PauseTypeRole[] unpauseTypeRoles;
     address fallbackOperator;
     address defaultAdmin;
+    address messagingService;
   }
 
   /**

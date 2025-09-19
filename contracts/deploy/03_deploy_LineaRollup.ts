@@ -17,6 +17,7 @@ import {
   LINEA_ROLLUP_UNPAUSE_TYPES_ROLES,
   OPERATOR_ROLE,
 } from "../common/constants";
+import { ADDRESS_ZERO } from "../test/hardhat/common/constants";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments } = hre;
@@ -69,6 +70,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         unpauseTypeRoles,
         fallbackOperator: MultiCallAddress,
         defaultAdmin: lineaRollupSecurityCouncil,
+        messagingService: ADDRESS_ZERO,
       },
     ],
     {

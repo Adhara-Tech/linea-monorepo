@@ -292,14 +292,6 @@ error EmptySubmissionData()
 
 _Thrown when submissionData is empty._
 
-### L1RollingHashDoesNotExistOnL1
-
-```solidity
-error L1RollingHashDoesNotExistOnL1(uint256 messageNumber, bytes32 rollingHash)
-```
-
-_Thrown when finalizationData.l1RollingHash does not exist on L1 (Feedback loop)._
-
 ### FinalizationStateIncorrect
 
 ```solidity
@@ -323,22 +315,6 @@ error FinalizationInTheFuture(uint256 l2BlockTimestamp, uint256 currentBlockTime
 ```
 
 _Thrown when final l2 block timestamp higher than current block.timestamp during finalization._
-
-### MissingMessageNumberForRollingHash
-
-```solidity
-error MissingMessageNumberForRollingHash(bytes32 rollingHash)
-```
-
-_Thrown when a rolling hash is provided without a corresponding message number._
-
-### MissingRollingHashForMessageNumber
-
-```solidity
-error MissingRollingHashForMessageNumber(uint256 messageNumber)
-```
-
-_Thrown when a message number is provided without a corresponding rolling hash._
 
 ### FirstByteIsNotZero
 
@@ -508,4 +484,20 @@ _OPERATOR_ROLE is required to execute._
 | _aggregatedProof | bytes | The aggregated proof. |
 | _proofType | uint256 | The proof type. |
 | _finalizationData | struct ILineaRollup.FinalizationDataV3 | The full finalization data. |
+
+### setMessagingContractAddress
+
+```solidity
+function setMessagingContractAddress(address _newMessagingAddress) external
+```
+
+Adds or updates the messaging service contract address.
+
+_MESSAGING_SETTER_ROLE is required to execute._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _newMessagingAddress | address | The address for the messaging contract to update during block finalization. |
 

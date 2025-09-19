@@ -22,6 +22,7 @@ import {
   OPERATOR_ROLE,
 } from "../common/constants";
 import { get1559Fees } from "../scripts/utils";
+import { ADDRESS_ZERO } from "../test/hardhat/common/constants";
 
 dotenv.config();
 
@@ -115,6 +116,7 @@ async function main() {
       unpauseTypeRoles,
       fallbackOperator: multiCallAddress,
       defaultAdmin: lineaRollupSecurityCouncil,
+      messagingService: ADDRESS_ZERO,
     },
   ]);
 

@@ -101,13 +101,25 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase, LineaConnector {
     }
   }
 
-  /* @notice Add cross-chain L1->L2 message hashes in storage. */
+  function sendMessage(address _to, uint256 _fee, bytes calldata _calldata) external payable override {
+    revert NotImplementedOrSupported();
+  }
+
+  function claimMessage(address _from, address _to, uint256 _fee, uint256 _value, address payable _feeRecipient, bytes calldata _calldata, uint256 _nonce) external override {
+    revert NotImplementedOrSupported();
+  }
+
+  function sender() external view override returns (address) {
+    revert NotImplementedOrSupported();
+  }
+
   function anchorL1L2MessageHashes(
     bytes32[] calldata messageHashes,
     uint256 startingMessageNumber,
     uint256 finalMessageNumber,
     bytes32 finalRollingHash
   ) external override {
+    // TODO: Check permission
     if (messageHashes.length == 0) {
       revert MessageHashesListLengthIsZero();
     }
