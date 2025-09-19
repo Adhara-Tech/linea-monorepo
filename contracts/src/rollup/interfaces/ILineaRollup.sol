@@ -36,6 +36,7 @@ interface ILineaRollup {
     IPauseManager.PauseTypeRole[] unpauseTypeRoles;
     address fallbackOperator;
     address defaultAdmin;
+    address messagingService;
   }
 
   /**
@@ -223,11 +224,6 @@ interface ILineaRollup {
   error EmptySubmissionData();
 
   /**
-   * @dev Thrown when finalizationData.l1RollingHash does not exist on L1 (Feedback loop).
-   */
-  error L1RollingHashDoesNotExistOnL1(uint256 messageNumber, bytes32 rollingHash);
-
-  /**
    * @dev Thrown when finalization state does not match.
    */
   error FinalizationStateIncorrect(bytes32 expected, bytes32 value);
@@ -241,16 +237,6 @@ interface ILineaRollup {
    * @dev Thrown when final l2 block timestamp higher than current block.timestamp during finalization.
    */
   error FinalizationInTheFuture(uint256 l2BlockTimestamp, uint256 currentBlockTimestamp);
-
-  /**
-   * @dev Thrown when a rolling hash is provided without a corresponding message number.
-   */
-  error MissingMessageNumberForRollingHash(bytes32 rollingHash);
-
-  /**
-   * @dev Thrown when a message number is provided without a corresponding rolling hash.
-   */
-  error MissingRollingHashForMessageNumber(uint256 messageNumber);
 
   /**
    * @dev Thrown when the first byte is not zero.
@@ -352,4 +338,11 @@ interface ILineaRollup {
     uint256 _proofType,
     FinalizationDataV3 calldata _finalizationData
   ) external;
+
+  /**
+   * @notice Adds or updates the messaging service contract address.
+   * @dev MESSAGING_SETTER_ROLE is required to execute.
+   * @param _newMessagingAddress The address for the messaging contract to update during block finalization.
+   */
+  function setMessagingContractAddress(address _newMessagingAddress) external;
 }

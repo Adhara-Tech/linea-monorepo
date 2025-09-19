@@ -46,6 +46,39 @@ abstract contract L1MessageService is
   }
 
   /**
+   * @notice Add the L2 Merkle roots to the storage.
+   * @dev This function is called during block finalization.
+   * @dev The _treeDepth does not need to be checked to be non-zero as it is,
+   * already enforced to be non-zero in the circuit, and used in the proof's public input.
+   * @param _newRoots New L2 Merkle roots.
+   */
+  function addL2MerkleRoots(bytes32[] calldata _newRoots, uint256 _treeDepth) external virtual override {
+    // TODO: Check permission
+    _addL2MerkleRoots(_newRoots, _treeDepth);
+  }
+
+  /**
+   * @notice Emit an event for each L2 block containing L2->L1 messages.
+   * @dev This function is called during block finalization.
+   * @param _l2MessagingBlocksOffsets Is a sequence of uint16 values, where each value plus the last finalized L2 block number.
+   * indicates which L2 blocks have L2->L1 messages.
+   * @param _currentL2BlockNumber Last L2 block number finalized on L1.
+   */
+  function anchorL2MessagingBlocks(bytes calldata _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual override {
+    // TODO: Check permission
+    _anchorL2MessagingBlocks(_l2MessagingBlocksOffsets, _currentL2BlockNumber);
+  }
+
+  /**
+   * @notice Internal function to validate l1 rolling hash.
+   * @param _rollingHashMessageNumber Message number associated with the rolling hash as computed on L2.
+   * @param _rollingHash L1 rolling hash as computed on L2.
+   */
+  function validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) external virtual view override {
+    _validateL2ComputedRollingHash(_rollingHashMessageNumber, _rollingHash);
+  }
+
+  /**
    * @notice Adds a message for sending cross-chain and emits MessageSent.
    * @dev The message number is preset (nextMessageNumber) and only incremented at the end if successful for the next caller.
    * @dev This function should be called with a msg.value = _value + _fee. The fee will be paid on the destination chain.

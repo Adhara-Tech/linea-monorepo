@@ -3,11 +3,13 @@ pragma solidity ^0.8.30;
 
 import { AccessControlUpgradeable } from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import { L1MessageService } from "../messaging/l1/L1MessageService.sol";
+import { IL1MessageService } from "../messaging/l1/interfaces/IL1MessageService.sol";
 import { ZkEvmV2 } from "./ZkEvmV2.sol";
 import { ILineaRollup } from "./interfaces/ILineaRollup.sol";
 import { PermissionsManager } from "../security/access/PermissionsManager.sol";
 
 import { EfficientLeftRightKeccak } from "../libraries/EfficientLeftRightKeccak.sol";
+
 /**
  * @title Contract to manage cross-chain messaging on L1, L2 data submission, and rollup proof verification.
  * @author ConsenSys Software Inc.
@@ -27,6 +29,9 @@ abstract contract LineaRollupBase is
 
   /// @notice The role required to set/remove  proof verifiers by type.
   bytes32 public constant VERIFIER_UNSETTER_ROLE = keccak256("VERIFIER_UNSETTER_ROLE");
+
+  /// @notice The role required to set the messaging contract address.
+  bytes32 public constant MESSAGING_SETTER_ROLE = keccak256("MESSAGING_SETTER_ROLE");
 
   /// @dev Value indicating a shnarf exists.
   uint256 internal constant SHNARF_EXISTS_DEFAULT_VALUE = 1;
@@ -85,6 +90,9 @@ abstract contract LineaRollupBase is
   /// @dev This address is granted the OPERATOR_ROLE after six months of finalization inactivity by the current operators.
   address public fallbackOperator;
 
+  // Message service on L1 to update message roots, can be external LineaL2Connector.
+  address public messagingContractAddress;
+
   /// @dev Keep 50 free storage slots for inheriting contracts.
   uint256[50] private __gap_LineaRollup;
 
@@ -103,6 +111,10 @@ abstract contract LineaRollupBase is
     __PauseManager_init(_initializationData.pauseTypeRoles, _initializationData.unpauseTypeRoles);
 
     __MessageService_init(_initializationData.rateLimitPeriodInSeconds, _initializationData.rateLimitAmountInWei);
+    messagingContractAddress = _initializationData.messagingService;
+    if (messagingContractAddress == address(0)) {
+      messagingContractAddress = address(this);
+    }
 
     if (_initializationData.defaultAdmin == address(0)) {
       revert ZeroAddressNotAllowed();
@@ -461,6 +473,17 @@ abstract contract LineaRollupBase is
       revert PointEvaluationResponseInvalid(fieldElements, blsCurveModulus);
     }
   }
+  /**
+   * @notice Set the contract to use for messaging storages.
+   * @dev MESSAGING_SETTER_ROLE is required to execute.
+   *
+   */
+  function setMessagingContractAddress(address _newContractAddress) external onlyRole(MESSAGING_SETTER_ROLE) {
+    if (_newContractAddress == address(0)) {
+      revert ZeroAddressNotAllowed();
+    }
+    messagingContractAddress = _newContractAddress;
+  }
 
   /**
    * @notice Finalize compressed blocks with proof.
@@ -509,7 +532,8 @@ abstract contract LineaRollupBase is
     FinalizationDataV3 calldata _finalizationData,
     uint256 _lastFinalizedBlock
   ) internal virtual returns (bytes32 finalShnarf) {
-    _validateL2ComputedRollingHash(_finalizationData.l1RollingHashMessageNumber, _finalizationData.l1RollingHash);
+    IL1MessageService messageStorage = IL1MessageService(messagingContractAddress);
+    messageStorage.validateL2ComputedRollingHash(_finalizationData.l1RollingHashMessageNumber, _finalizationData.l1RollingHash);
 
     if (
       _computeLastFinalizedState(
@@ -548,8 +572,8 @@ abstract contract LineaRollupBase is
       revert FinalBlobNotSubmitted(finalShnarf);
     }
 
-    _addL2MerkleRoots(_finalizationData.l2MerkleRoots, _finalizationData.l2MerkleTreesDepth);
-    _anchorL2MessagingBlocks(_finalizationData.l2MessagingBlocksOffsets, _lastFinalizedBlock);
+    messageStorage.addL2MerkleRoots(_finalizationData.l2MerkleRoots, _finalizationData.l2MerkleTreesDepth);
+    messageStorage.anchorL2MessagingBlocks(_finalizationData.l2MessagingBlocksOffsets, _lastFinalizedBlock);
 
     stateRootHashes[_finalizationData.endBlockNumber] = _finalizationData.shnarfData.finalStateRootHash;
 
@@ -570,26 +594,6 @@ abstract contract LineaRollupBase is
       _finalizationData.parentStateRootHash,
       _finalizationData.shnarfData.finalStateRootHash
     );
-  }
-
-  /**
-   * @notice Internal function to validate l1 rolling hash.
-   * @param _rollingHashMessageNumber Message number associated with the rolling hash as computed on L2.
-   * @param _rollingHash L1 rolling hash as computed on L2.
-   */
-  function _validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) internal view {
-    if (_rollingHashMessageNumber == 0) {
-      if (_rollingHash != EMPTY_HASH) {
-        revert MissingMessageNumberForRollingHash(_rollingHash);
-      }
-    } else {
-      if (_rollingHash == EMPTY_HASH) {
-        revert MissingRollingHashForMessageNumber(_rollingHashMessageNumber);
-      }
-      if (rollingHashes[_rollingHashMessageNumber] != _rollingHash) {
-        revert L1RollingHashDoesNotExistOnL1(_rollingHashMessageNumber, _rollingHash);
-      }
-    }
   }
 
   /**

@@ -17,7 +17,7 @@ contract TestLineaRollup is LineaRollup {
     rollingHashes[_messageNumber] = _rollingHash;
   }
 
-  function validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) external view {
+  function validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) external virtual view override {
     _validateL2ComputedRollingHash(_rollingHashMessageNumber, _rollingHash);
   }
 

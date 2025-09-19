@@ -1,0 +1,19 @@
+# `IL2MessageService`
+
+### anchorL1L2MessageHashes
+
+```solidity
+function anchorL1L2MessageHashes(bytes32[] _messageHashes, uint256 _startingMessageNumber, uint256 _finalMessageNumber, bytes32 _finalRollingHash) external
+```
+
+Add cross-chain L1->L2 message hashes in storage.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _messageHashes | bytes32[] | New message hashes to anchor on L2. |
+| _startingMessageNumber | uint256 | The expected L1 message number to start when anchoring. |
+| _finalMessageNumber | uint256 | The expected L1 message number to end on when anchoring. |
+| _finalRollingHash | bytes32 | The expected L1 rolling hash to end on when anchoring. |
+

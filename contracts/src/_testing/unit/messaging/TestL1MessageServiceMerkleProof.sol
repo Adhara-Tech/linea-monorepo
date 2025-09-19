@@ -81,7 +81,7 @@ contract TestL1MessageServiceMerkleProof is L1MessageService, TestSetPauseTypeRo
     _setL2L1MessageToClaimed(_index);
   }
 
-  function addL2MerkleRoots(bytes32[] calldata _newRoot, uint256 _treeDepth) external {
+  function addL2MerkleRoots(bytes32[] calldata _newRoot, uint256 _treeDepth) external virtual override {
     _addL2MerkleRoots(_newRoot, _treeDepth);
   }
 }

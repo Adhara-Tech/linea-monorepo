@@ -23,10 +23,61 @@ Initialises underlying message service dependencies.
 | _rateLimitPeriod | uint256 | The period to rate limit against. |
 | _rateLimitAmount | uint256 | The limit allowed for withdrawing the period. |
 
+### addL2MerkleRoots
+
+```solidity
+function addL2MerkleRoots(bytes32[] _newRoots, uint256 _treeDepth) external virtual
+```
+
+Add the L2 Merkle roots to the storage.
+
+_This function is called during block finalization.
+The _treeDepth does not need to be checked to be non-zero as it is,
+already enforced to be non-zero in the circuit, and used in the proof's public input._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _newRoots | bytes32[] | New L2 Merkle roots. |
+| _treeDepth | uint256 |  |
+
+### anchorL2MessagingBlocks
+
+```solidity
+function anchorL2MessagingBlocks(bytes _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual
+```
+
+Emit an event for each L2 block containing L2->L1 messages.
+
+_This function is called during block finalization._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _l2MessagingBlocksOffsets | bytes | Is a sequence of uint16 values, where each value plus the last finalized L2 block number. indicates which L2 blocks have L2->L1 messages. |
+| _currentL2BlockNumber | uint256 | Last L2 block number finalized on L1. |
+
+### validateL2ComputedRollingHash
+
+```solidity
+function validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) external view virtual
+```
+
+Internal function to validate l1 rolling hash.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _rollingHashMessageNumber | uint256 | Message number associated with the rolling hash as computed on L2. |
+| _rollingHash | bytes32 | L1 rolling hash as computed on L2. |
+
 ### sendMessage
 
 ```solidity
-function sendMessage(address _to, uint256 _fee, bytes _calldata) external payable
+function sendMessage(address _to, uint256 _fee, bytes _calldata) external payable virtual
 ```
 
 Adds a message for sending cross-chain and emits MessageSent.
@@ -42,10 +93,26 @@ This function should be called with a msg.value = _value + _fee. The fee will be
 | _fee | uint256 | The fee being paid for the message delivery. |
 | _calldata | bytes | The calldata to pass to the recipient. |
 
+### _sendMessage
+
+```solidity
+function _sendMessage(address _to, uint256 _fee, bytes _calldata) internal virtual
+```
+
+Adds a message for sending cross-chain and emits MessageSent.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _to | address | The address the message is intended for. |
+| _fee | uint256 | The fee being paid for the message delivery. |
+| _calldata | bytes | The calldata to pass to the recipient. |
+
 ### claimMessageWithProof
 
 ```solidity
-function claimMessageWithProof(struct IL1MessageService.ClaimMessageWithProofParams _params) external
+function claimMessageWithProof(struct IL1MessageService.ClaimMessageWithProofParams _params) external virtual
 ```
 
 Claims and delivers a cross-chain message using a Merkle proof.
@@ -59,10 +126,24 @@ if tree depth is different than proof size, it will revert with ProofLengthDiffe
 | ---- | ---- | ----------- |
 | _params | struct IL1MessageService.ClaimMessageWithProofParams | Collection of claim data with proof and supporting data. |
 
+### _claimMessageWithProof
+
+```solidity
+function _claimMessageWithProof(struct IL1MessageService.ClaimMessageWithProofParams _params) internal virtual
+```
+
+Claims and delivers a cross-chain message using a Merkle proof.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _params | struct IL1MessageService.ClaimMessageWithProofParams | Collection of claim data with proof and supporting data. |
+
 ### sender
 
 ```solidity
-function sender() external view returns (address originalSender)
+function sender() external view virtual returns (address originalSender)
 ```
 
 Claims and delivers a cross-chain message.

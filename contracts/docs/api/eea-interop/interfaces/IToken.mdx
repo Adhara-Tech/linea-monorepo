@@ -1,0 +1,134 @@
+# `IToken`
+
+### _HOLD_STATUS_NON_EXISTENT
+
+```solidity
+bytes32 _HOLD_STATUS_NON_EXISTENT
+```
+
+### _HOLD_STATUS_NEW
+
+```solidity
+bytes32 _HOLD_STATUS_NEW
+```
+
+### _HOLD_STATUS_PERPETUAL
+
+```solidity
+bytes32 _HOLD_STATUS_PERPETUAL
+```
+
+### _HOLD_STATUS_CANCELLED
+
+```solidity
+bytes32 _HOLD_STATUS_CANCELLED
+```
+
+### _HOLD_STATUS_EXECUTED
+
+```solidity
+bytes32 _HOLD_STATUS_EXECUTED
+```
+
+### _HOLD_TYPE_NORMAL
+
+```solidity
+bytes32 _HOLD_TYPE_NORMAL
+```
+
+### _HOLD_TYPE_DESTROY
+
+```solidity
+bytes32 _HOLD_TYPE_DESTROY
+```
+
+### getAvailableBalanceOf
+
+```solidity
+function getAvailableBalanceOf(string account) external view virtual returns (uint256)
+```
+
+### createHold
+
+```solidity
+function createHold(string operationId, string fromAccount, string toAccount, string notaryId, uint256 amount, uint256 duration, string metaData) external virtual returns (bool)
+```
+
+### CreateHoldExecuted
+
+```solidity
+event CreateHoldExecuted(string operationId, string fromAccount, string toAccount, string notaryId, uint256 amount, string metaData)
+```
+
+### cancelHold
+
+```solidity
+function cancelHold(string operationId) external virtual returns (bool)
+```
+
+### CancelHoldExecuted
+
+```solidity
+event CancelHoldExecuted(string operationId)
+```
+
+### executeHold
+
+```solidity
+function executeHold(string operationId) external virtual returns (bool)
+```
+
+### ExecuteHoldExecuted
+
+```solidity
+event ExecuteHoldExecuted(string operationId)
+```
+
+### makeHoldPerpetual
+
+```solidity
+function makeHoldPerpetual(string operationId) external virtual returns (bool)
+```
+
+### MakeHoldPerpetualExecuted
+
+```solidity
+event MakeHoldPerpetualExecuted(string operationId)
+```
+
+### getHoldData
+
+```solidity
+function getHoldData(string operationId) external view virtual returns (string fromAccount, string toAccount, string notaryId, uint256 amount, uint256 expiryTimestamp, string metaData, bytes32 holdStatus, bytes32 holdType, bytes32 signer)
+```
+
+### addHoldNotary
+
+```solidity
+function addHoldNotary(string notaryId, address holdNotaryAdminAddress) external virtual returns (bool)
+```
+
+### isHoldNotary
+
+```solidity
+function isHoldNotary(string notaryId) external view virtual returns (bool)
+```
+
+### create
+
+```solidity
+function create(string operationId, string toAccount, uint256 amount, string metaData) external virtual returns (bool)
+```
+
+### destroy
+
+```solidity
+function destroy(string operationId, string fromAccount, uint256 amount, string metaData) external virtual returns (bool)
+```
+
+### transfer
+
+```solidity
+function transfer(string operationId, string fromAccount, string toAccount, uint256 amount, string metaData) external virtual returns (bool)
+```
+

@@ -1,0 +1,73 @@
+# `IAuthParams`
+
+### authParamsCanBeDecoded
+
+```solidity
+function authParamsCanBeDecoded(uint256 calldataLength) internal pure returns (bool)
+```
+
+Helper function for doing some sanity checks on the calldata before decoding it.
+Decoding will fail unless the calldata is at least 52 bytes long, but
+Should be at least 56 bytes to include the function signature as well
+
+### encodeAuthParams
+
+```solidity
+function encodeAuthParams(bytes functionCallParameters, uint256 networkId, address contractAddress) internal pure returns (bytes)
+```
+
+Encodes the network identification and contract address and appends it to the function call data.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| functionCallParameters | bytes | The function call parameters to append the authentication parameters to. |
+| networkId | uint256 | The network identification to include in the authentication parameters. |
+| contractAddress | address | The contract address to include in the authentication parameters. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bytes | Returns the function call parameters with concatenated authentication parameters. |
+
+### decodeAuthParams
+
+```solidity
+function decodeAuthParams() internal pure returns (uint256 networkId, address contractAddress)
+```
+
+Decodes the network identification and contract address found at the end of the calldata sent to the target function
+of the inbound call. IMPORTANT: This function will only work properly when used as part of the
+execution of the inbound cross blockchain call, i.e. with the calldata/msg.data exactly equal
+to the functionCallData provided in the encodedInfo - otherwise there can be an unknown number of zeros padded
+at the end, making it difficult / impossible to robustly perform this decoding.
+The function call parameters to extract the authentication parameters from is obtained from msg.data.
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | The network identification extracted from the authentication parameters. |
+| contractAddress | address | The contract address extracted from the authentication parameters. |
+
+### decodeAuthParamsFromParameter
+
+```solidity
+function decodeAuthParamsFromParameter(bytes functionCallData) internal pure returns (uint256 networkId, address contractAddress)
+```
+
+Decodes the network identification and contract address found at the end of the calldata sent to the target function
+of the inbound call. This function differs from decodeNonAtomicAuthParamsFromCalldata since it operates on
+a parameter instead of directly on msg.data. The passed in functionCallData must be exactly what
+is going to be used when invoking the call on the target contract.
+The function call parameters to extract the authentication parameters from is obtained from msg.data.
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | The network identification extracted from the authentication parameters. |
+| contractAddress | address | The contract address extracted from the authentication parameters. |
+

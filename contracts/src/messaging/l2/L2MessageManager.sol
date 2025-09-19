@@ -38,12 +38,12 @@ abstract contract L2MessageManager is AccessControlUpgradeable, IL2MessageManage
    * @param _finalMessageNumber The expected L1 message number to end on when anchoring.
    * @param _finalRollingHash The expected L1 rolling hash to end on when anchoring.
    */
-  function anchorL1L2MessageHashes(
+  function _anchorL1L2MessageHashes(
     bytes32[] calldata _messageHashes,
     uint256 _startingMessageNumber,
     uint256 _finalMessageNumber,
     bytes32 _finalRollingHash
-  ) external whenTypeNotPaused(PauseType.GENERAL) onlyRole(L1_L2_MESSAGE_SETTER_ROLE) {
+  ) internal whenTypeNotPaused(PauseType.GENERAL) onlyRole(L1_L2_MESSAGE_SETTER_ROLE) {
     if (_messageHashes.length == 0) {
       revert MessageHashesListLengthIsZero();
     }

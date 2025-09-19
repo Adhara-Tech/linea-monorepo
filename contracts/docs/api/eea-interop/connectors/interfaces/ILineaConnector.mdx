@@ -1,0 +1,139 @@
+# `ILineaConnector`
+
+### ProofData
+
+```solidity
+struct ProofData {
+  bytes32 root;
+  uint32 leafIndex;
+  bytes32[] witnesses;
+}
+```
+
+### MessageData
+
+```solidity
+struct MessageData {
+  address from;
+  address to;
+  uint256 fee;
+  uint256 value;
+  bytes data;
+  uint256 messageNumber;
+  address payable feeRecipient;
+}
+```
+
+### Signature
+
+```solidity
+struct Signature {
+  uint256 by;
+  uint256 sigR;
+  uint256 sigS;
+  uint256 sigV;
+  bytes meta;
+}
+```
+
+### Proof
+
+```solidity
+struct Proof {
+  uint256 typ;
+  struct ILineaConnector.ProofData proof;
+  struct ILineaConnector.Signature[] signatures;
+}
+```
+
+### MessageSent
+
+```solidity
+event MessageSent(address from, address to, uint256 fee, uint256 value, uint256 messageNumber, bytes callData, bytes32 messageHash)
+```
+
+Emitted when a message is sent.
+
+_calldata has the  because calldata is a reserved word.
+We include the message hash to save hashing costs on the rollup.
+This event is used on both L1 and L2._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| from | address | The indexed sender address of the message (msg.sender). |
+| to | address | The indexed intended recipient address of the message on the other layer. |
+| fee | uint256 | The fee being being paid to deliver the message to the recipient in Wei. |
+| value | uint256 | The value being sent to the recipient in Wei. |
+| messageNumber | uint256 | The unique message number. |
+| callData | bytes | The call data being passed to the intended recipient when being called on claiming. |
+| messageHash | bytes32 | The indexed hash of the message parameters. |
+
+### MessageClaimed
+
+```solidity
+event MessageClaimed(bytes32 messageHash)
+```
+
+Emitted when a message is claimed.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| messageHash | bytes32 | The indexed hash of the message that was claimed. |
+
+### FeeTooLow
+
+```solidity
+error FeeTooLow()
+```
+
+### ValueSentTooLow
+
+```solidity
+error ValueSentTooLow()
+```
+
+### MessageSendingFailed
+
+```solidity
+error MessageSendingFailed(address destination)
+```
+
+### FeePaymentFailed
+
+```solidity
+error FeePaymentFailed(address recipient)
+```
+
+### ZeroAddressNotAllowed
+
+```solidity
+error ZeroAddressNotAllowed()
+```
+
+### ZeroHashNotAllowed
+
+```solidity
+error ZeroHashNotAllowed()
+```
+
+### SafeCastOverflowedUintDowncast
+
+```solidity
+error SafeCastOverflowedUintDowncast(uint8 bits, uint256 value)
+```
+
+_Value doesn't fit in a uint of `bits` size.
+This is based on OpenZeppelin's SafeCast library._
+
+### LeafIndexOutOfBounds
+
+```solidity
+error LeafIndexOutOfBounds(uint32 leafIndex, uint32 maxAllowedIndex)
+```
+
+_Custom error for when the leaf index is out of bounds._
+

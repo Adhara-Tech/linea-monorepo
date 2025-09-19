@@ -1,0 +1,265 @@
+# `LineaL2Connector`
+
+### EMPTY_HASH
+
+```solidity
+bytes32 EMPTY_HASH
+```
+
+_The default hash value._
+
+### minimumFeeInWei
+
+```solidity
+uint256 minimumFeeInWei
+```
+
+### nextMessageNumber
+
+```solidity
+uint256 nextMessageNumber
+```
+
+### rollingHashes
+
+```solidity
+mapping(uint256 => bytes32) rollingHashes
+```
+
+### _messageClaimedBitMap
+
+```solidity
+struct BitMaps.BitMap _messageClaimedBitMap
+```
+
+### l2MerkleRootsDepths
+
+```solidity
+mapping(bytes32 => uint256) l2MerkleRootsDepths
+```
+
+### decodeAndVerify
+
+```solidity
+function decodeAndVerify(uint256 networkId, bytes encodedInfo, bytes encodedProof) external virtual returns (address contractAddress, bytes functionCallData)
+```
+
+Performs all steps needed to verify a crosschain call and returns verified parameters for function call execution.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | The id of the remote chain that originated the cross blockchain call. |
+| encodedInfo | bytes | The encoded information of the event needed to trigger the crosschain call. |
+| encodedProof | bytes | The signature or proof used to check whether the encodedInfo is valid. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contractAddress | address | The verified contract address where the crosschain function call should be executed. |
+| functionCallData | bytes | The verified function call data with which the crosschain function call should be made. |
+
+### authenticateHiddenAuthParams
+
+```solidity
+function authenticateHiddenAuthParams(address contractAddress, bytes functionCallData) external view virtual returns (bool)
+```
+
+Authenticates the hidden auth parameters appended to the end of the function calldata.
+See https://entethalliance.org/specs/dlt-interop/#application-authentication-parameters
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contractAddress | address | The address of the contract where the call is being made to |
+| functionCallData | bytes | The calldata of the call, including the hidden auth parameters |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool |  |
+
+### updateAndCommit
+
+```solidity
+function updateAndCommit(uint256 networkId, address contractAddress, bytes functionCallData) external payable virtual
+```
+
+Performs all local prerequisite updates and commits to a crosschain call.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | Identifier of target network where the function call is to be made. |
+| contractAddress | address | Address of the contract on the target network to which the function call is to be made. |
+| functionCallData | bytes | The function call data that consists of the ABI-encoded function selector and input parameter data with which the remote function should be called. |
+
+### _addRollingHash
+
+```solidity
+function _addRollingHash(uint256 _messageNumber, bytes32 _messageHash) internal
+```
+
+Take an existing message hash, calculates the rolling hash and stores at the message number.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _messageNumber | uint256 | The current message number being sent. |
+| _messageHash | bytes32 | The hash of the message being sent. |
+
+### _setL2L1MessageToClaimed
+
+```solidity
+function _setL2L1MessageToClaimed(uint256 _messageNumber) internal
+```
+
+Set the L2->L1 message as claimed when a user claims a message on L1.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _messageNumber | uint256 | The message number on L2. |
+
+### _isMessageClaimed
+
+```solidity
+function _isMessageClaimed(uint256 messageNumber) external view returns (bool isClaimed)
+```
+
+Checks if the L2->L1 message is claimed or not.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| messageNumber | uint256 | The message number on L2. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| isClaimed | bool | Returns whether or not the message with _messageNumber has been claimed. |
+
+### addL2MerkleRoots
+
+```solidity
+function addL2MerkleRoots(bytes32[] _newRoots, uint256 _treeDepth) external virtual
+```
+
+Add the L2 Merkle roots to the storage.
+
+_This function is called during block finalization.
+The _treeDepth does not need to be checked to be non-zero as it is,
+already enforced to be non-zero in the circuit, and used in the proof's public input._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _newRoots | bytes32[] | New L2 Merkle roots. |
+| _treeDepth | uint256 |  |
+
+### anchorL2MessagingBlocks
+
+```solidity
+function anchorL2MessagingBlocks(bytes _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual
+```
+
+Emit an event for each L2 block containing L2->L1 messages.
+
+_This function is called during block finalization._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _l2MessagingBlocksOffsets | bytes | Is a sequence of uint16 values, where each value plus the last finalized L2 block number. indicates which L2 blocks have L2->L1 messages. |
+| _currentL2BlockNumber | uint256 | Last L2 block number finalized on L1. |
+
+### validateL2ComputedRollingHash
+
+```solidity
+function validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) external view virtual
+```
+
+Internal function to validate L1 rolling hash.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| rollingHashMessageNumber | uint256 | Message number associated with the rolling hash as computed on L2. |
+| rollingHash | bytes32 | L1 rolling hash as computed on L2. |
+
+### claimMessageWithProof
+
+```solidity
+function claimMessageWithProof(struct IL1MessageService.ClaimMessageWithProofParams _params) external virtual
+```
+
+Claims and delivers a cross-chain message using a Merkle proof.
+
+_if tree depth is empty, it will revert with L2MerkleRootDoesNotExist.
+if tree depth is different than proof size, it will revert with ProofLengthDifferentThanMerkleDepth._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _params | struct IL1MessageService.ClaimMessageWithProofParams | Collection of claim data with proof and supporting data. |
+
+### _verifyMerkleProof
+
+```solidity
+function _verifyMerkleProof(bytes32 _leafHash, bytes32[] _proof, uint32 _leafIndex, bytes32 _root) internal pure returns (bool proofIsValid)
+```
+
+Verify merkle proof
+
+_The depth of the tree is expected to be validated elsewhere beforehand._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _leafHash | bytes32 | Leaf hash. |
+| _proof | bytes32[] | Sparse merkle tree proof. |
+| _leafIndex | uint32 | Index of the leaf. |
+| _root | bytes32 | Merkle root. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| proofIsValid | bool | Returns if the proof is valid or not. |
+
+### _safeCastToUint32
+
+```solidity
+function _safeCastToUint32(uint256 _value) internal pure returns (uint32 castUint32)
+```
+
+Tries to safely cast to uint32.
+
+_This is based on OpenZeppelin's SafeCast library._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _value | uint256 | The value being cast to uint32. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| castUint32 | uint32 | Returns a uint32 safely cast. |
+
