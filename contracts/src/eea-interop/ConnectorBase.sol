@@ -23,6 +23,4 @@ abstract contract ConnectorBase is IConnector, IAuthParams {
   function setRemoteNetworkId(uint256 networkId) external {
     remoteNetworkId = networkId;
   }
-
-
 }

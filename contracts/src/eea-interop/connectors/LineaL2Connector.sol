@@ -34,6 +34,12 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
   // @notice Contains the L2 messages Merkle roots mapped to their tree depth.
   mapping(bytes32 merkleRoot => uint256 treeDepth) public l2MerkleRootsDepths;
 
+  //uint8 public constant INBOX_STATUS_UNKNOWN = 0;
+  //uint8 public constant INBOX_STATUS_RECEIVED = 1;
+
+  // @dev Mapping to store L2->L1 message hashes status. For the most part this has been deprecated. This is only used for messages received pre-AlphaV2.
+  //mapping(bytes32 messageHash => uint256 messageStatus) public inboxL2L1MessageStatus;
+
   // @dev Total contract storage is 53 slots including the gap below.
   // @dev Keep 50 free storage slots for future implementation updates to avoid storage collision.
   uint256[50] private __gap_L1MessageManager;
@@ -125,7 +131,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
   }
 
   function addL2MerkleRoots(bytes32[] calldata _newRoots, uint256 _treeDepth) external virtual override {
-    // TODO: Check permission
+    // TODO: Check permission. Only rollup contract
     for (uint256 i; i < _newRoots.length; ++i) {
       if (l2MerkleRootsDepths[_newRoots[i]] != 0) {
         revert L2MerkleRootAlreadyAnchored(_newRoots[i]);
@@ -136,7 +142,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
   }
 
   function anchorL2MessagingBlocks(bytes calldata _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual override {
-    // TODO: Check permission
+    // TODO: Check permission. Only rollup contract
     if (_l2MessagingBlocksOffsets.length % 2 != 0) {
       revert BytesLengthNotMultipleOfTwo(_l2MessagingBlocksOffsets.length);
     }
@@ -199,7 +205,7 @@ contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
    * @param messageNumber The message number on L2.
    * @return isClaimed Returns whether or not the message with _messageNumber has been claimed.
    */
-  function _isMessageClaimed(uint256 messageNumber) external view returns (bool isClaimed) {
+  function _isMessageClaimed(uint256 messageNumber) internal view returns (bool isClaimed) {
     isClaimed = _messageClaimedBitMap.get(messageNumber);
   }
 

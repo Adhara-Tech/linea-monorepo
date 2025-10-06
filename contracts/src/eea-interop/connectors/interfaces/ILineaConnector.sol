@@ -44,15 +44,10 @@ interface ILineaConnector is IMessageService {
   /* @dev Thrown when a parameter is the zero hash. */
   error ZeroHashNotAllowed();
 
-  /**
-   * @dev Value doesn't fit in a uint of `bits` size.
-   * @dev This is based on OpenZeppelin's SafeCast library.
-   */
+  /* @dev Value doesn't fit in a uint of `bits` size. Based on OpenZeppelin's SafeCast library.  */
   error SafeCastOverflowedUintDowncast(uint8 bits, uint256 value);
 
-  /**
-   * @dev Custom error for when the leaf index is out of bounds.
-   */
+  /* @dev Custom error for when the leaf index is out of bounds. */
   error LeafIndexOutOfBounds(uint32 leafIndex, uint32 maxAllowedIndex);
 
 }

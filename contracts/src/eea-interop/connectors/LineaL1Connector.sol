@@ -33,6 +33,9 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase, LineaConnector {
   /* @dev Mapping to store L1->L2 message hashes status: messageHash => messageStatus (0: unknown, 1: received, 2: claimed). */
   mapping(bytes32 messageHash => uint256 messageStatus) public inboxL1L2MessageStatus;
 
+  /// @notice The role required to anchor L1 to L2 message hashes.
+  bytes32 public constant L1_L2_MESSAGE_SETTER_ROLE = keccak256("L1_L2_MESSAGE_SETTER_ROLE");
+
   function decodeAndVerify(
     uint256 networkId,
     bytes calldata encodedInfo,
@@ -113,13 +116,20 @@ contract LineaL1Connector is ILineaL1Connector, ConnectorBase, LineaConnector {
     revert NotImplementedOrSupported();
   }
 
+  function setMinimumFee(uint256 _feeInWei) external { // }onlyRole(MINIMUM_FEE_SETTER_ROLE) {
+    uint256 previousMinimumFee = minimumFeeInWei;
+    minimumFeeInWei = _feeInWei;
+
+    emit MinimumFeeChanged(previousMinimumFee, _feeInWei, msg.sender);
+  }
+
   function anchorL1L2MessageHashes(
     bytes32[] calldata messageHashes,
     uint256 startingMessageNumber,
     uint256 finalMessageNumber,
     bytes32 finalRollingHash
   ) external override {
-    // TODO: Check permission
+    // TODO: Check permission. Only trusted coordinator.
     if (messageHashes.length == 0) {
       revert MessageHashesListLengthIsZero();
     }
