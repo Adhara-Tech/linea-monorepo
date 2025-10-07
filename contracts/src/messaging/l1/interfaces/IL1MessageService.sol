@@ -8,6 +8,29 @@ pragma solidity ^0.8.30;
  */
 
 interface IL1MessageService {
+
+  /**
+   * @notice Add the L2 Merkle roots to the storage. This function is called during block finalization.
+   * @notice The indexed tree depth does not need to be checked to be non-zero as it is, already enforced to be non-zero in the circuit, and used in the proof's public input.
+   * @param treeDepth The indexed tree depth of the Merkle root.
+   * @param newRoots New L2 Merkle roots.
+   */
+  function addL2MerkleRoots(bytes32[] calldata newRoots, uint256 treeDepth) external; // TODO: Protect this function with a permission so that only the rollup can call
+
+  /**
+   * @notice Emit an event for each L2 block containing L2->L1 messages. This function is called during block finalization.
+   * @param l2MessagingBlocksOffsets Is a sequence of uint16 values, where each value plus the last finalized L2 block number indicates which L2 blocks have L2->L1 messages.
+   * @param currentL2BlockNumber Last L2 block number finalized on L1.
+   */
+  function anchorL2MessagingBlocks(bytes calldata l2MessagingBlocksOffsets, uint256 currentL2BlockNumber) external; // TODO: Protect this function with a permission so that only the rollup can call
+
+  /**
+   * @notice Internal function to validate L1 rolling hash.
+   * @param rollingHashMessageNumber Message number associated with the rolling hash as computed on L2.
+   * @param rollingHash L1 rolling hash as computed on L2.
+   */
+  function validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) external view;
+
   /**
    * @param proof The Merkle proof array related to the claimed message.
    * @param messageNumber The message number of the claimed message.

@@ -19,6 +19,10 @@
   },
   "author": "",
   "license": "(MIT OR Apache-2.0)",
+  "dependencies": {
+    "@consensys/linea-native-libs": "workspace:*",
+    "@consensys/linea-sdk": "workspace:*"
+  },
   "devDependencies": {
     "@jest/globals": "catalog:",
     "@openzeppelin/upgrades-core": "1.42.1",

@@ -46,6 +46,21 @@ interface IL1MessageManager {
   error BytesLengthNotMultipleOfTwo(uint256 bytesLength);
 
   /**
+   * @dev Thrown when a rolling hash is provided without a corresponding message number.
+   */
+  error MissingMessageNumberForRollingHash(bytes32 rollingHash);
+
+  /**
+   * @dev Thrown when a message number is provided without a corresponding rolling hash.
+   */
+  error MissingRollingHashForMessageNumber(uint256 messageNumber);
+
+  /**
+   * @dev Thrown when finalizationData.l1RollingHash does not exist on L1 (Feedback loop).
+   */
+  error L1RollingHashDoesNotExistOnL1(uint256 messageNumber, bytes32 rollingHash);
+
+  /**
    * @notice Checks if the L2->L1 message is claimed or not.
    * @param _messageNumber The message number on L2.
    * @return isClaimed Returns whether or not the message with _messageNumber has been claimed.

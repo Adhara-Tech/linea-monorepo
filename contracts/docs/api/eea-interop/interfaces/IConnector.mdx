@@ -1,0 +1,81 @@
+# `IConnector`
+
+### decodeAndVerify
+
+```solidity
+function decodeAndVerify(uint256 networkId, bytes encodedInfo, bytes encodedProof) external virtual returns (address contractAddress, bytes functionCallData)
+```
+
+Performs all steps needed to verify a crosschain call and returns verified parameters for function call execution.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | The id of the remote chain that originated the cross blockchain call. |
+| encodedInfo | bytes | The encoded information of the event needed to trigger the crosschain call. |
+| encodedProof | bytes | The signature or proof used to check whether the encodedInfo is valid. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contractAddress | address | The verified contract address where the crosschain function call should be executed. |
+| functionCallData | bytes | The verified function call data with which the crosschain function call should be made. |
+
+### authenticateHiddenAuthParams
+
+```solidity
+function authenticateHiddenAuthParams(address contractAddress, bytes functionCallData) external view virtual returns (bool isValid)
+```
+
+Authenticates the hidden auth parameters appended to the end of the function calldata.
+See https://entethalliance.org/specs/dlt-interop/#application-authentication-parameters
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| contractAddress | address | The address of the contract where the call is being made to |
+| functionCallData | bytes | The calldata of the call, including the hidden auth parameters |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| isValid | bool | A boolean, indicating whether the parameters are valid |
+
+### updateAndCommit
+
+```solidity
+function updateAndCommit(uint256 networkId, address contractAddress, bytes functionCallData) external payable virtual
+```
+
+Performs all local prerequisite updates and commits to a crosschain call.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | Identifier of target network where the function call is to be made. |
+| contractAddress | address | Address of the contract on the target network to which the function call is to be made. |
+| functionCallData | bytes | The function call data that consists of the ABI-encoded function selector and input parameter data with which the remote function should be called. |
+
+### getLocalNetworkId
+
+```solidity
+function getLocalNetworkId() external view virtual returns (uint256)
+```
+
+### getRemoteNetworkId
+
+```solidity
+function getRemoteNetworkId() external view virtual returns (uint256)
+```
+
+### NotImplementedOrSupported
+
+```solidity
+error NotImplementedOrSupported()
+```
+

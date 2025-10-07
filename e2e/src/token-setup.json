@@ -1,0 +1,24 @@
+{
+  "l1Token": {
+    "target": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318"
+  },
+  "l1Bridge": {
+    "target": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6"
+  },
+  "l1Account": {
+    "address": "0x55591335b602F498192d099e5aE5415c2CD29286",
+    "privateKey": "0x388cf93f07fecb7d4c95f678510a6f2b14cd92530eca7b5f19e6e0045c224cf9"
+  },
+  "l1RpcUrl": "http://localhost:8445",
+  "l2Token": {
+    "target": "0x8eB566fe8E8C6d10bcc5510BEF932D743ca5aB7D"
+  },
+  "l2Bridge": {
+    "target": "0x5C95Bcd50E6D1B4E3CDC478484C9030Ff0a7D493"
+  },
+  "l2Account": {
+    "address": "0x1C2d9d58684631EA7358252392985bcD97966fAc",
+    "privateKey": "0x76c8174caaef7af5cf319e522a7603dc5672846ec3bb409d18d2f0f2bfb9ac8f"
+  },
+  "l2RpcUrl": "http://localhost:8545"
+}

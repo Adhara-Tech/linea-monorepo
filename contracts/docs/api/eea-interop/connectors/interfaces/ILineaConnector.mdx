@@ -1,0 +1,72 @@
+# `ILineaConnector`
+
+### ProofData
+
+```solidity
+struct ProofData {
+  bytes32 root;
+  uint32 leafIndex;
+  bytes32[] witnesses;
+}
+```
+
+### MessageData
+
+```solidity
+struct MessageData {
+  address from;
+  address to;
+  uint256 fee;
+  uint256 value;
+  bytes data;
+  uint256 messageNumber;
+  address payable feeRecipient;
+}
+```
+
+### Signature
+
+```solidity
+struct Signature {
+  uint256 by;
+  uint256 sigR;
+  uint256 sigS;
+  uint256 sigV;
+  bytes meta;
+}
+```
+
+### Proof
+
+```solidity
+struct Proof {
+  uint256 typ;
+  struct ILineaConnector.ProofData proof;
+  struct ILineaConnector.Signature[] signatures;
+}
+```
+
+### ZeroAddressNotAllowed
+
+```solidity
+error ZeroAddressNotAllowed()
+```
+
+### ZeroHashNotAllowed
+
+```solidity
+error ZeroHashNotAllowed()
+```
+
+### SafeCastOverflowedUintDowncast
+
+```solidity
+error SafeCastOverflowedUintDowncast(uint8 bits, uint256 value)
+```
+
+### LeafIndexOutOfBounds
+
+```solidity
+error LeafIndexOutOfBounds(uint32 leafIndex, uint32 maxAllowedIndex)
+```
+

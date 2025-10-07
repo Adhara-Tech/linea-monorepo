@@ -100,6 +100,26 @@ abstract contract L1MessageManager is L1MessageManagerV1, IL1MessageManager {
   }
 
   /**
+   * @notice Internal function to validate l1 rolling hash.
+   * @param _rollingHashMessageNumber Message number associated with the rolling hash as computed on L2.
+   * @param _rollingHash L1 rolling hash as computed on L2.
+   */
+  function _validateL2ComputedRollingHash(uint256 _rollingHashMessageNumber, bytes32 _rollingHash) internal view {
+    if (_rollingHashMessageNumber == 0) {
+      if (_rollingHash != 0x0) {
+        revert MissingMessageNumberForRollingHash(_rollingHash);
+      }
+    } else {
+      if (_rollingHash == 0x0) {
+        revert MissingRollingHashForMessageNumber(_rollingHashMessageNumber);
+      }
+      if (rollingHashes[_rollingHashMessageNumber] != _rollingHash) {
+        revert L1RollingHashDoesNotExistOnL1(_rollingHashMessageNumber, _rollingHash);
+      }
+    }
+  }
+
+  /**
    * @notice Checks if the L2->L1 message is claimed or not.
    * @param _messageNumber The message number on L2.
    * @return isClaimed Returns whether or not the message with _messageNumber has been claimed.

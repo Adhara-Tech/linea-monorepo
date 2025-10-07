@@ -24,10 +24,10 @@ mapping(uint256 => bytes32) l1RollingHashes
 
 Contains the L1 to L2 messaging rolling hashes mapped to message number computed on L2.
 
-### anchorL1L2MessageHashes
+### _anchorL1L2MessageHashes
 
 ```solidity
-function anchorL1L2MessageHashes(bytes32[] _messageHashes, uint256 _startingMessageNumber, uint256 _finalMessageNumber, bytes32 _finalRollingHash) external
+function _anchorL1L2MessageHashes(bytes32[] _messageHashes, uint256 _startingMessageNumber, uint256 _finalMessageNumber, bytes32 _finalRollingHash) internal
 ```
 
 Add cross-chain L1->L2 message hashes in storage.

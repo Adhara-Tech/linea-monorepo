@@ -73,6 +73,30 @@ error BytesLengthNotMultipleOfTwo(uint256 bytesLength)
 
 _Thrown when the L2 messaging blocks offsets bytes length is not a multiple of 2._
 
+### MissingMessageNumberForRollingHash
+
+```solidity
+error MissingMessageNumberForRollingHash(bytes32 rollingHash)
+```
+
+_Thrown when a rolling hash is provided without a corresponding message number._
+
+### MissingRollingHashForMessageNumber
+
+```solidity
+error MissingRollingHashForMessageNumber(uint256 messageNumber)
+```
+
+_Thrown when a message number is provided without a corresponding rolling hash._
+
+### L1RollingHashDoesNotExistOnL1
+
+```solidity
+error L1RollingHashDoesNotExistOnL1(uint256 messageNumber, bytes32 rollingHash)
+```
+
+_Thrown when finalizationData.l1RollingHash does not exist on L1 (Feedback loop)._
+
 ### isMessageClaimed
 
 ```solidity

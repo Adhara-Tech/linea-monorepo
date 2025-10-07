@@ -1,0 +1,18 @@
+# `IEEAConnector`
+
+### CrosschainFunctionCall
+
+```solidity
+event CrosschainFunctionCall(uint256 networkId, address contractAddress, bytes functionCallData)
+```
+
+This event is included in the EEA specification to facilitate crosschain messaging to and from EVM systems.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| networkId | uint256 | Identifier of the target network where the call is to be made. |
+| contractAddress | address | Address of the contract on the target network to which the function call is to be made. |
+| functionCallData | bytes | The function call data that consists of the ABI-encoded function selector and input parameter data with which the remote function should be called. |
+

@@ -1,0 +1,114 @@
+# `Token`
+
+### owner
+
+```solidity
+address owner
+```
+
+### Hold
+
+```solidity
+struct Hold {
+  string fromAccount;
+  string toAccount;
+  string notaryId;
+  uint256 amount;
+  uint256 expiryTimestamp;
+  string metaData;
+  bytes32 holdStatus;
+  bytes32 holdType;
+  bytes32 signer;
+}
+```
+
+### balances
+
+```solidity
+mapping(string => uint256) balances
+```
+
+### holds
+
+```solidity
+mapping(string => struct Token.Hold) holds
+```
+
+### notaries
+
+```solidity
+mapping(string => address) notaries
+```
+
+### constructor
+
+```solidity
+constructor() public
+```
+
+### createHold
+
+```solidity
+function createHold(string operationId, string fromAccount, string toAccount, string notaryId, uint256 amount, uint256 duration, string metaData) external returns (bool)
+```
+
+### executeHold
+
+```solidity
+function executeHold(string operationId) external returns (bool)
+```
+
+### cancelHold
+
+```solidity
+function cancelHold(string operationId) external returns (bool)
+```
+
+### getHoldData
+
+```solidity
+function getHoldData(string operationId) external view virtual returns (string fromAccount, string toAccount, string notaryId, uint256 amount, uint256 expiryTimestamp, string metaData, bytes32 holdStatus, bytes32 holdType, bytes32 signer)
+```
+
+### addHoldNotary
+
+```solidity
+function addHoldNotary(string notaryId, address holdNotaryAdminAddress) external returns (bool)
+```
+
+### isHoldNotary
+
+```solidity
+function isHoldNotary(string notaryId) external view returns (bool)
+```
+
+### makeHoldPerpetual
+
+```solidity
+function makeHoldPerpetual(string operationId) external returns (bool)
+```
+
+### create
+
+```solidity
+function create(string operationId, string toAccount, uint256 amount, string metaData) external returns (bool)
+```
+
+### destroy
+
+```solidity
+function destroy(string operationId, string fromAccount, uint256 amount, string metaData) external returns (bool)
+```
+
+### transfer
+
+```solidity
+function transfer(string operationId, string fromAccount, string toAccount, uint256 amount, string metaData) external returns (bool)
+```
+
+### getAvailableBalanceOf
+
+```solidity
+function getAvailableBalanceOf(string account) external view returns (uint256)
+```
+
