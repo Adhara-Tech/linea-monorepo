@@ -9,7 +9,7 @@ import "../interfaces/IAuthParams.sol";
 
 import "../interfaces/IConnector.sol";
 import "./LineaConnector.sol";
-import "./interfaces/IL1LineaConnector.sol";
+import "./interfaces/ILineaL1Connector.sol";
 
 contract LineaL1Connector is ILineaL1Connector, ConnectorBase, LineaConnector {
 

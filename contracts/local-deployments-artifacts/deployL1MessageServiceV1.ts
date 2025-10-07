@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
 import {
-  contractName as L2MessageServiceContractName,
-  abi as L2MessageServiceAbi,
-  bytecode as L2MessageServiceBytecode,
-} from "./dynamic-artifacts/L2MessageServiceV1.json";
+  contractName as L1MessageServiceContractName,
+  abi as L1MessageServiceAbi,
+  bytecode as L1MessageServiceBytecode,
+} from "./dynamic-artifacts/L1MessageServiceV1.json";
+
 import {
   contractName as ProxyAdminContractName,
   abi as ProxyAdminAbi,
@@ -43,13 +44,13 @@ async function main() {
     walletNonce = parseInt(process.env.L2_NONCE);
   }
 
-  const l2MessageServiceContractImplementationName = "L2MessageServiceImplementation";
+  const l1MessageServiceContractImplementationName = "L1MessageServiceImplementation";
 
-  const [l2MessageServiceImplementation, proxyAdmin] = await Promise.all([
+  const [l1MessageServiceImplementation, proxyAdmin] = await Promise.all([
     deployContractFromArtifacts(
-      l2MessageServiceContractImplementationName,
-      L2MessageServiceAbi,
-      L2MessageServiceBytecode,
+      l1MessageServiceContractImplementationName,
+      L1MessageServiceAbi,
+      L1MessageServiceBytecode,
       wallet,
       {
         nonce: walletNonce,
@@ -61,7 +62,7 @@ async function main() {
   ]);
 
   const proxyAdminAddress = await proxyAdmin.getAddress();
-  const l2MessageServiceImplementationAddress = await l2MessageServiceImplementation.getAddress();
+  const l1MessageServiceImplementationAddress = await l1MessageServiceImplementation.getAddress();
 
   const pauseTypeRoles = getEnvVarOrDefault("L2MSGSERVICE_PAUSE_TYPE_ROLES", L2_MESSAGE_SERVICE_PAUSE_TYPES_ROLES);
   const unpauseTypeRoles = getEnvVarOrDefault(
@@ -75,7 +76,7 @@ async function main() {
   );
   const roleAddresses = getEnvVarOrDefault("L2MSGSERVICE_ROLE_ADDRESSES", defaultRoleAddresses);
 
-  const initializer = getInitializerData(L2MessageServiceAbi, "initialize", [
+  const initializer = getInitializerData(L1MessageServiceAbi, "initialize", [
     process.env.L2MSGSERVICE_RATE_LIMIT_PERIOD,
     process.env.L2MSGSERVICE_RATE_LIMIT_AMOUNT,
     process.env.L2MSGSERVICE_SECURITY_COUNCIL,
@@ -83,13 +84,13 @@ async function main() {
     pauseTypeRoles,
     unpauseTypeRoles,
   ]);
-  console.log("GOT HERE L2MessageService:", l2MessageServiceImplementationAddress);
+
   await deployContractFromArtifacts(
-    L2MessageServiceContractName,
+    L1MessageServiceContractName,
     TransparentUpgradeableProxyAbi,
     TransparentUpgradeableProxyBytecode,
     wallet,
-    l2MessageServiceImplementationAddress,
+    l1MessageServiceImplementationAddress,
     proxyAdminAddress,
     initializer,
   );

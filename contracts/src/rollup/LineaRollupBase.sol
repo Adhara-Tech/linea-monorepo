@@ -115,7 +115,9 @@ abstract contract LineaRollupBase is
     if (messagingContractAddress == address(0)) {
       messagingContractAddress = address(this);
     }
-
+    if (messagingContractAddress == address(0)) {
+      revert ZeroAddressNotAllowed();
+    }
     if (_initializationData.defaultAdmin == address(0)) {
       revert ZeroAddressNotAllowed();
     }

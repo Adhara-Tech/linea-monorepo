@@ -97,7 +97,6 @@ async function main() {
       nonce: walletNonce + 2,
     }),
   ]);
-
   const bridgedTokenAddress = await bridgedToken.getAddress();
   const tokenBridgeImplementationAddress = await tokenBridgeImplementation.getAddress();
   const proxyAdminAddress = await proxyAdmin.getAddress();

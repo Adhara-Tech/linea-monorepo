@@ -2,7 +2,11 @@ import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
 import * as dotenv from "dotenv";
-import { abi as LineaRollupV6Abi, bytecode as LineaRollupV6Bytecode } from "./dynamic-artifacts/LineaRollupV6.json";
+import {
+  abi as L1MessageServiceAbi,
+  bytecode as L1MessageServiceBytecode,
+} from "./dynamic-artifacts/LineaL2Connector.json";
+import { abi as LineaRollupV6Abi, bytecode as LineaRollupV6Bytecode } from "./dynamic-artifacts/LineaRollup.json";
 import {
   contractName as ProxyAdminContractName,
   abi as ProxyAdminAbi,
@@ -22,7 +26,6 @@ import {
   OPERATOR_ROLE,
 } from "../common/constants";
 import { get1559Fees } from "../scripts/utils";
-import { ADDRESS_ZERO } from "../test/hardhat/common/constants";
 
 dotenv.config();
 
@@ -60,6 +63,7 @@ async function main() {
   const multiCallAddress = "0xcA11bde05977b3631167028862bE2a173976CA11";
   const lineaRollupName = "LineaRollupV6";
   const lineaRollupImplementationName = "LineaRollupV6Implementation";
+  const l1MessageServiceImplementationName = "L1MessageServiceImplementation";
 
   const pauseTypeRoles = getEnvVarOrDefault("LINEA_ROLLUP_PAUSE_TYPE_ROLES", LINEA_ROLLUP_PAUSE_TYPES_ROLES);
   const unpauseTypeRoles = getEnvVarOrDefault("LINEA_ROLLUP_UNPAUSE_TYPE_ROLES", LINEA_ROLLUP_UNPAUSE_TYPES_ROLES);
@@ -83,24 +87,35 @@ async function main() {
   } else {
     walletNonce = parseInt(process.env.L1_NONCE);
   }
-
-  const [verifier, lineaRollupImplementation, proxyAdmin] = await Promise.all([
+  const [verifier, messagingService, lineaRollupImplementation, proxyAdmin] = await Promise.all([
     deployContractFromArtifacts(verifierName, verifierArtifacts.abi, verifierArtifacts.bytecode, wallet, {
       nonce: walletNonce,
       gasPrice,
     }),
+    deployContractFromArtifacts(
+      l1MessageServiceImplementationName,
+      L1MessageServiceAbi,
+      L1MessageServiceBytecode,
+      wallet,
+      {
+        nonce: walletNonce + 1,
+        gasPrice,
+      },
+    ),
     deployContractFromArtifacts(lineaRollupImplementationName, LineaRollupV6Abi, LineaRollupV6Bytecode, wallet, {
-      nonce: walletNonce + 1,
+      nonce: walletNonce + 2,
       gasPrice,
     }),
     deployContractFromArtifacts(ProxyAdminContractName, ProxyAdminAbi, ProxyAdminBytecode, wallet, {
-      nonce: walletNonce + 2,
+      nonce: walletNonce + 3,
       gasPrice,
     }),
   ]);
 
   const proxyAdminAddress = await proxyAdmin.getAddress();
   const verifierAddress = await verifier.getAddress();
+  const messagingServiceAddress = await messagingService.getAddress();
+  console.log("L1MessageServiceAddress:", messagingServiceAddress);
   const lineaRollupImplementationAddress = await lineaRollupImplementation.getAddress();
 
   const initializer = getInitializerData(LineaRollupV6Abi, "initialize", [
@@ -116,7 +131,7 @@ async function main() {
       unpauseTypeRoles,
       fallbackOperator: multiCallAddress,
       defaultAdmin: lineaRollupSecurityCouncil,
-      messagingService: ADDRESS_ZERO,
+      messagingService: "0x0000000000000000000000000000000000000000", //messagingServiceAddress,
     },
   ]);
 

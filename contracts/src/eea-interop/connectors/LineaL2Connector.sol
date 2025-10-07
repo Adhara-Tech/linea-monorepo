@@ -9,7 +9,7 @@ import "../interfaces/IAuthParams.sol";
 import "../interfaces/IConnector.sol";
 
 import "./LineaConnector.sol";
-import "./interfaces/IL2LineaConnector.sol";
+import "./interfaces/ILineaL2Connector.sol";
 import {BitMaps} from "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 
 contract LineaL2Connector is ILineaL2Connector, ConnectorBase, LineaConnector {
