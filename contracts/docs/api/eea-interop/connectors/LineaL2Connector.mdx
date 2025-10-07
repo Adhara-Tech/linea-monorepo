@@ -1,4 +1,12 @@
-# `LineaL1Connector`
+# `LineaL2Connector`
+
+### EMPTY_HASH
+
+```solidity
+bytes32 EMPTY_HASH
+```
+
+_The default hash value._
 
 ### minimumFeeInWei
 
@@ -12,40 +20,22 @@ uint256 minimumFeeInWei
 uint256 nextMessageNumber
 ```
 
-### lastAnchoredL1MessageNumber
+### rollingHashes
 
 ```solidity
-uint256 lastAnchoredL1MessageNumber
+mapping(uint256 => bytes32) rollingHashes
 ```
 
-### l1RollingHashes
+### _messageClaimedBitMap
 
 ```solidity
-mapping(uint256 => bytes32) l1RollingHashes
+struct BitMaps.BitMap _messageClaimedBitMap
 ```
 
-### INBOX_STATUS_UNKNOWN
+### l2MerkleRootsDepths
 
 ```solidity
-uint8 INBOX_STATUS_UNKNOWN
-```
-
-### INBOX_STATUS_RECEIVED
-
-```solidity
-uint8 INBOX_STATUS_RECEIVED
-```
-
-### INBOX_STATUS_CLAIMED
-
-```solidity
-uint8 INBOX_STATUS_CLAIMED
-```
-
-### inboxL1L2MessageStatus
-
-```solidity
-mapping(bytes32 => uint256) inboxL1L2MessageStatus
+mapping(bytes32 => uint256) l2MerkleRootsDepths
 ```
 
 ### decodeAndVerify
@@ -162,15 +152,143 @@ Returns the original sender of the message on the origin layer.
 | ---- | ---- | ----------- |
 | [0] | address |  |
 
-### anchorL1L2MessageHashes
+### claimMessageWithProof
 
 ```solidity
-function anchorL1L2MessageHashes(bytes32[] messageHashes, uint256 startingMessageNumber, uint256 finalMessageNumber, bytes32 finalRollingHash) external
+function claimMessageWithProof(struct IL1MessageService.ClaimMessageWithProofParams _params) external virtual
 ```
 
-### _updateL1L2MessageStatusToClaimed
+Claims and delivers a cross-chain message using a Merkle proof.
+
+_if tree depth is empty, it will revert with L2MerkleRootDoesNotExist.
+if tree depth is different than proof size, it will revert with ProofLengthDifferentThanMerkleDepth._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _params | struct IL1MessageService.ClaimMessageWithProofParams | Collection of claim data with proof and supporting data. |
+
+### addL2MerkleRoots
 
 ```solidity
-function _updateL1L2MessageStatusToClaimed(bytes32 messageHash) internal
+function addL2MerkleRoots(bytes32[] _newRoots, uint256 _treeDepth) external virtual
 ```
+
+### anchorL2MessagingBlocks
+
+```solidity
+function anchorL2MessagingBlocks(bytes _l2MessagingBlocksOffsets, uint256 _currentL2BlockNumber) external virtual
+```
+
+### validateL2ComputedRollingHash
+
+```solidity
+function validateL2ComputedRollingHash(uint256 rollingHashMessageNumber, bytes32 rollingHash) external view virtual
+```
+
+Internal function to validate L1 rolling hash.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| rollingHashMessageNumber | uint256 | Message number associated with the rolling hash as computed on L2. |
+| rollingHash | bytes32 | L1 rolling hash as computed on L2. |
+
+### _addRollingHash
+
+```solidity
+function _addRollingHash(uint256 _messageNumber, bytes32 _messageHash) internal
+```
+
+Take an existing message hash, calculates the rolling hash and stores at the message number.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _messageNumber | uint256 | The current message number being sent. |
+| _messageHash | bytes32 | The hash of the message being sent. |
+
+### _setL2L1MessageToClaimed
+
+```solidity
+function _setL2L1MessageToClaimed(uint256 _messageNumber) internal
+```
+
+Set the L2->L1 message as claimed when a user claims a message on L1.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _messageNumber | uint256 | The message number on L2. |
+
+### _isMessageClaimed
+
+```solidity
+function _isMessageClaimed(uint256 messageNumber) internal view returns (bool isClaimed)
+```
+
+Checks if the L2->L1 message is claimed or not.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| messageNumber | uint256 | The message number on L2. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| isClaimed | bool | Returns whether or not the message with _messageNumber has been claimed. |
+
+### _verifyMerkleProof
+
+```solidity
+function _verifyMerkleProof(bytes32 _leafHash, bytes32[] _proof, uint32 _leafIndex, bytes32 _root) internal pure returns (bool proofIsValid)
+```
+
+Verify merkle proof
+
+_The depth of the tree is expected to be validated elsewhere beforehand._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _leafHash | bytes32 | Leaf hash. |
+| _proof | bytes32[] | Sparse merkle tree proof. |
+| _leafIndex | uint32 | Index of the leaf. |
+| _root | bytes32 | Merkle root. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| proofIsValid | bool | Returns if the proof is valid or not. |
+
+### _safeCastToUint32
+
+```solidity
+function _safeCastToUint32(uint256 _value) internal pure returns (uint32 castUint32)
+```
+
+Tries to safely cast to uint32.
+
+_This is based on OpenZeppelin's SafeCast library._
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _value | uint256 | The value being cast to uint32. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| castUint32 | uint32 | Returns a uint32 safely cast. |
 

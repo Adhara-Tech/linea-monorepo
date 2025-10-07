@@ -48,6 +48,14 @@ uint8 INBOX_STATUS_CLAIMED
 mapping(bytes32 => uint256) inboxL1L2MessageStatus
 ```
 
+### L1_L2_MESSAGE_SETTER_ROLE
+
+```solidity
+bytes32 L1_L2_MESSAGE_SETTER_ROLE
+```
+
+The role required to anchor L1 to L2 message hashes.
+
 ### decodeAndVerify
 
 ```solidity
@@ -161,6 +169,12 @@ Returns the original sender of the message on the origin layer.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | [0] | address |  |
+
+### setMinimumFee
+
+```solidity
+function setMinimumFee(uint256 _feeInWei) external
+```
 
 ### anchorL1L2MessageHashes
 
